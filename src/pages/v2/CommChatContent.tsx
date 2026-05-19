@@ -426,10 +426,23 @@ function RoasGauge() {
 
 // ── Ad Signal Analysis — realistic 24h ROAS + CTR chart ──────────────────────
 function WaveformCard() {
-  const W = 500, H = 100, PL = 32, PR = 6, PT = 6, PB = 18;
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const [svgW, setSvgW] = React.useState(500);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const obs = new ResizeObserver(entries => {
+      for (const entry of entries) setSvgW(Math.max(200, entry.contentRect.width));
+    });
+    obs.observe(el);
+    setSvgW(Math.max(200, el.clientWidth));
+    return () => obs.disconnect();
+  }, []);
+
+  const W = svgW, H = 100, PL = 32, PR = 8, PT = 6, PB = 18;
   const CW = W - PL - PR, CH = H - PT - PB;
 
-  // Same realistic data as dashboard for consistency
   const roas = [3.8,3.2,2.9,2.7,3.1,4.2,6.8,9.4,12.1,14.8,16.2,17.1,15.4,13.8,12.9,14.2,16.8,18.3,17.6,15.2,12.4,9.8,7.1,5.2];
   const ctr  = [0.8,0.7,0.6,0.6,0.8,1.1,1.8,2.4,3.1,3.6,3.9,4.1,3.7,3.2,3.0,3.4,4.0,4.3,4.1,3.5,2.8,2.1,1.5,1.1];
   const maxR = 22, maxC = 5.5;
@@ -454,9 +467,9 @@ function WaveformCard() {
   const avgCtr  = (ctr.reduce((a,b)=>a+b,0)/ctr.length).toFixed(2);
 
   return (
-    <div style={{ background: c.bgCard, border: `1px solid ${c.border}`, borderRadius: 10, padding: '14px 18px', flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+    <div style={{ background: c.bgCard, border: `1px solid ${c.border}`, borderRadius: 10, padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 10 }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <M size={10} color={c.textPri} upper style={{ letterSpacing: '0.08em' }}>Ad Signal Analysis</M>
           <span style={{ fontFamily: c.mono, fontSize: 8, color: c.textMute }}>Last 24h</span>
@@ -474,50 +487,53 @@ function WaveformCard() {
         </div>
       </div>
 
-      {/* Chart */}
-      <svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`} style={{ display: 'block', overflow: 'visible' }}>
-        <defs>
-          <linearGradient id="wcGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={c.accent} stopOpacity={0.16}/>
-            <stop offset="100%" stopColor={c.accent} stopOpacity={0.01}/>
-          </linearGradient>
-        </defs>
-        {/* Grid */}
-        {yTicks.map(v=>(
-          <line key={v} x1={PL} y1={yR(v).toFixed(1)} x2={W-PR} y2={yR(v).toFixed(1)}
-            stroke="rgba(255,255,255,0.045)" strokeWidth={0.7} strokeDasharray={v===0?'none':'3,3'} />
-        ))}
-        {yTicks.filter(v=>v>0).map(v=>(
-          <text key={v} x={PL-3} y={yR(v)+3} textAnchor="end" fontFamily={c.mono} fontSize={7} fill={c.textMute}>{v}×</text>
-        ))}
-        {/* Area + lines */}
-        <path d={area} fill="url(#wcGrad)" />
-        <polyline points={ctrPts} fill="none" stroke="#3B82F6" strokeWidth={1.2} strokeLinejoin="round" opacity={0.6} strokeDasharray="4,2" />
-        <polyline points={roasPts} fill="none" stroke={c.accent} strokeWidth={1.8} strokeLinejoin="round" opacity={0.92}
-          style={{ filter:`drop-shadow(0 0 3px rgba(0,177,162,0.5))` }} />
-        {/* Key dots */}
-        {[9,17,21].map(h=>(
-          <circle key={h} cx={xOf(h)} cy={yR(roas[h])} r={2.5} fill={c.bgCard} stroke={c.accent} strokeWidth={1.5} />
-        ))}
-        {/* Events */}
-        {events.map(ev=>(
-          <g key={ev.h}>
-            <line x1={xOf(ev.h)} y1={PT} x2={xOf(ev.h)} y2={PT+CH}
-              stroke={ev.color} strokeWidth={0.8} strokeDasharray="3,2" opacity={0.5} />
-            <text x={xOf(ev.h)} y={PT+9} textAnchor="middle" fontFamily={c.mono} fontSize={7} fill={ev.color} opacity={0.85}>{ev.label}</text>
-          </g>
-        ))}
-        {/* Now */}
-        <line x1={xOf(nowH)} y1={PT} x2={xOf(nowH)} y2={PT+CH} stroke="rgba(255,255,255,0.12)" strokeWidth={1} />
-        {/* X labels */}
-        {xLabels.map(({h,t})=>(
-          <text key={h} x={xOf(h)} y={PT+CH+13} textAnchor="middle" fontFamily={c.mono} fontSize={7}
-            fill={h===nowH ? c.textSec : c.textMute}>{h===nowH?'NOW':t}</text>
-        ))}
-      </svg>
+      {/* Responsive chart container */}
+      <div ref={containerRef} style={{ width: '100%' }}>
+        <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`}
+          style={{ display: 'block', width: '100%', height: 'auto', overflow: 'visible' }}>
+          <defs>
+            <linearGradient id="wcGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={c.accent} stopOpacity={0.16}/>
+              <stop offset="100%" stopColor={c.accent} stopOpacity={0.01}/>
+            </linearGradient>
+          </defs>
+          {/* Grid */}
+          {yTicks.map(v=>(
+            <line key={v} x1={PL} y1={yR(v).toFixed(1)} x2={W-PR} y2={yR(v).toFixed(1)}
+              stroke="rgba(255,255,255,0.045)" strokeWidth={0.7} strokeDasharray={v===0?'none':'3,3'} />
+          ))}
+          {yTicks.filter(v=>v>0).map(v=>(
+            <text key={v} x={PL-3} y={yR(v)+3} textAnchor="end" fontFamily={c.mono} fontSize={7} fill={c.textMute}>{v}×</text>
+          ))}
+          {/* Area + lines */}
+          <path d={area} fill="url(#wcGrad)" />
+          <polyline points={ctrPts} fill="none" stroke="#3B82F6" strokeWidth={1.2} strokeLinejoin="round" opacity={0.6} strokeDasharray="4,2" />
+          <polyline points={roasPts} fill="none" stroke={c.accent} strokeWidth={1.8} strokeLinejoin="round" opacity={0.92}
+            style={{ filter:`drop-shadow(0 0 3px rgba(0,177,162,0.5))` }} />
+          {/* Key dots */}
+          {[9,17,21].map(h=>(
+            <circle key={h} cx={xOf(h)} cy={yR(roas[h])} r={2.5} fill={c.bgCard} stroke={c.accent} strokeWidth={1.5} />
+          ))}
+          {/* Events */}
+          {events.map(ev=>(
+            <g key={ev.h}>
+              <line x1={xOf(ev.h)} y1={PT} x2={xOf(ev.h)} y2={PT+CH}
+                stroke={ev.color} strokeWidth={0.8} strokeDasharray="3,2" opacity={0.5} />
+              <text x={xOf(ev.h)} y={PT+9} textAnchor="middle" fontFamily={c.mono} fontSize={7} fill={ev.color} opacity={0.85}>{ev.label}</text>
+            </g>
+          ))}
+          {/* Now */}
+          <line x1={xOf(nowH)} y1={PT} x2={xOf(nowH)} y2={PT+CH} stroke="rgba(255,255,255,0.12)" strokeWidth={1} />
+          {/* X labels */}
+          {xLabels.map(({h,t})=>(
+            <text key={h} x={xOf(h)} y={PT+CH+13} textAnchor="middle" fontFamily={c.mono} fontSize={7}
+              fill={h===nowH ? c.textSec : c.textMute}>{h===nowH?'NOW':t}</text>
+          ))}
+        </svg>
+      </div>
 
       {/* Stats row */}
-      <div style={{ display: 'flex', gap: 16, paddingTop: 8, borderTop: `1px solid ${c.border}` }}>
+      <div style={{ display: 'flex', gap: 16, paddingTop: 8, borderTop: `1px solid ${c.border}`, flexWrap: 'wrap' }}>
         {[
           { label: 'Peak ROAS', val: `${peakR}×`, color: c.accent },
           { label: 'Avg ROAS',  val: `${avgRoas}×` },

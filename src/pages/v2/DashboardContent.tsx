@@ -38,7 +38,6 @@ function CampaignPerformance() {
   const COLS = '90px 1fr 58px 80px';
   return (
     <div style={{ overflow: 'hidden' }}>
-      {/* Sub-header: account + pixel */}
       <div style={{
         display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap',
         padding: '7px 16px', borderBottom: `1px solid ${c.border}`,
@@ -56,7 +55,6 @@ function CampaignPerformance() {
         <div style={{ flex: 1 }} />
         <M size={8} color={c.textSec}>74 ad sets · 5 campaigns</M>
       </div>
-      {/* Column headers */}
       <div style={{
         display: 'grid', gridTemplateColumns: COLS, columnGap: 8,
         padding: '7px 16px', borderBottom: `1px solid ${c.border}`,
@@ -66,7 +64,6 @@ function CampaignPerformance() {
           <M key={h} size={8} color={c.textSec} upper>{h}</M>
         ))}
       </div>
-      {/* Campaign rows */}
       {campaigns.map((cp, i) => {
         const color  = roasColor(cp.status);
         const barPct = Math.min(100, (cp.roas / ROAS_SCALE) * 100);
@@ -84,7 +81,6 @@ function CampaignPerformance() {
               <M size={10} color={c.textPri} style={{ display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: 4 }}>
                 {cp.title}
               </M>
-              {/* ROAS mini-bar */}
               <div style={{ position: 'relative', height: 4, background: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
                 <div style={{ position: 'absolute', left: 0, top: 0, height: '100%', width: `${barPct}%`, background: color, borderRadius: 2, opacity: 0.72, boxShadow: cp.status !== 'below' ? `0 0 5px ${color}` : 'none' }} />
                 <div style={{ position: 'absolute', left: `${minPct}%`, top: -2, bottom: -2, width: 1, background: '#FF4466', opacity: 0.45 }} />
@@ -92,7 +88,6 @@ function CampaignPerformance() {
               </div>
             </div>
             <M size={9} color={c.textSec}>{cp.adSets}</M>
-            {/* ROAS value + label */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
               <M size={11} color={color}>{cp.roas}×</M>
               <M size={7} color={color} upper style={{ opacity: 0.7 }}>{roasLabel(cp.status)}</M>
@@ -100,7 +95,6 @@ function CampaignPerformance() {
           </div>
         );
       })}
-      {/* Footer */}
       <div style={{ padding: '8px 16px', background: 'rgba(0,177,162,0.018)', borderTop: `1px solid ${c.border}`, display: 'flex', gap: 16, alignItems: 'center' }}>
         <M size={8} color={c.textSec} upper>Avg ROAS</M>
         <M size={10} color={c.accent}>{AVG_ROAS}×</M>
@@ -113,7 +107,6 @@ function CampaignPerformance() {
           <M size={8} color={c.textSec} upper>1 below threshold</M>
         </div>
       </div>
-      {/* Alert note */}
       <div style={{ borderLeft: `3px solid #3B82F6`, padding: '10px 14px', display: 'flex', gap: 8, alignItems: 'flex-start' }}>
         <span style={{ color: '#3B82F6', fontSize: 13, flexShrink: 0, marginTop: 1 }}>ℹ</span>
         <M size={10} color={c.textSec}>
@@ -193,12 +186,10 @@ function RoasBenchmark() {
           const tgtPct = (THRESH_TGT / ROAS_SCALE) * 100;
           return (
             <div key={cp.id} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              {/* Name */}
               <M size={9} color={cp.status === 'below' ? '#FF4466' : c.textSec}
                 style={{ width: 130, flexShrink: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {cp.title}
               </M>
-              {/* Track */}
               <div style={{ flex: 1, position: 'relative', height: 8, background: 'rgba(255,255,255,0.04)', borderRadius: 4 }}>
                 <div style={{
                   position: 'absolute', left: 0, top: 0, height: '100%',
@@ -206,11 +197,9 @@ function RoasBenchmark() {
                   opacity: 0.75,
                   boxShadow: cp.status !== 'below' ? `0 0 8px ${color}40` : 'none',
                 }} />
-                {/* Threshold markers */}
                 <div style={{ position: 'absolute', left: `${minPct}%`, top: -3, bottom: -3, width: 1, background: '#FF4466', opacity: 0.5 }} />
                 <div style={{ position: 'absolute', left: `${tgtPct}%`, top: -3, bottom: -3, width: 1, background: '#FFB800', opacity: 0.5 }} />
               </div>
-              {/* Value */}
               <M size={10} color={color} style={{ flexShrink: 0, minWidth: 34, textAlign: 'right' }}>{cp.roas}×</M>
             </div>
           );
@@ -230,7 +219,6 @@ function LiveStats() {
       display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
       height: '100%', boxSizing: 'border-box',
     }}>
-      {/* Top: label + status */}
       <div>
         <M size={8} color={c.textSec} upper style={{ display: 'block', marginBottom: 10 }}>Account Status</M>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -238,7 +226,6 @@ function LiveStats() {
           <M size={15} color={c.accent} style={{ textShadow: `0 0 12px rgba(0,177,162,0.4)` }}>Active</M>
         </div>
       </div>
-      {/* Mid: stats */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         {[
           { k: 'Campaigns', v: '5' },
@@ -253,7 +240,6 @@ function LiveStats() {
           </div>
         ))}
       </div>
-      {/* Bottom: paused note */}
       <div>
         <div style={{ height: 1, background: c.border, marginBottom: 8 }} />
         <M size={8} color={c.textMute} upper>All ads PAUSED</M>
@@ -262,62 +248,55 @@ function LiveStats() {
   );
 }
 
-// ── Ad Signal Analysis ────────────────────────────────────────────────────────
-// Realistic 24-hour ROAS + CTR chart with noise, events, axes
+// ── Ad Signal Analysis — responsive ──────────────────────────────────────────
 function WaveformSection() {
-  const W = 480, H = 110, PAD_L = 36, PAD_R = 8, PAD_T = 8, PAD_B = 22;
-  const CW = W - PAD_L - PAD_R, CH = H - PAD_T - PAD_B;
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  const [svgW, setSvgW] = React.useState(480);
 
-  // Seeded pseudo-random for consistent look
+  React.useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const obs = new ResizeObserver(entries => {
+      for (const entry of entries) setSvgW(Math.max(200, entry.contentRect.width));
+    });
+    obs.observe(el);
+    setSvgW(Math.max(200, el.clientWidth));
+    return () => obs.disconnect();
+  }, []);
+
+  const H = 120, PAD_L = 36, PAD_R = 12, PAD_T = 14, PAD_B = 22;
+  const W = svgW, CW = W - PAD_L - PAD_R, CH = H - PAD_T - PAD_B;
+
   const rng = (() => { let s = 42; return () => { s = (s * 1664525 + 1013904223) & 0xffffffff; return (s >>> 0) / 0xffffffff; }; })();
-
-  // 24 hourly ROAS values — realistic ad pattern: slow morning, peaks midday + evening
   const roasBase = [3.8,3.2,2.9,2.7,3.1,4.2,6.8,9.4,12.1,14.8,16.2,17.1,15.4,13.8,12.9,14.2,16.8,18.3,17.6,15.2,12.4,9.8,7.1,5.2];
   const roas = roasBase.map(v => Math.max(0, v + (rng() - 0.5) * 2.8));
-  const maxRoas = 22, minRoas = 0;
-
-  // CTR % — generally correlated with ROAS but noisier
   const ctrBase = [0.8,0.7,0.6,0.6,0.8,1.1,1.8,2.4,3.1,3.6,3.9,4.1,3.7,3.2,3.0,3.4,4.0,4.3,4.1,3.5,2.8,2.1,1.5,1.1];
-  const ctr  = ctrBase.map(v => Math.max(0, v + (rng() - 0.5) * 0.7));
-  const maxCtr = 5.5;
+  const ctr = ctrBase.map(v => Math.max(0, v + (rng() - 0.5) * 0.7));
+  const maxRoas = 22, minRoas = 0, maxCtr = 5.5;
 
-  const xOf = (i: number) => PAD_L + (i / 23) * CW;
+  const xOf   = (i: number) => PAD_L + (i / 23) * CW;
   const yRoas = (v: number) => PAD_T + CH - ((v - minRoas) / (maxRoas - minRoas)) * CH;
   const yCtr  = (v: number) => PAD_T + CH - (v / maxCtr) * CH;
 
-  // Build SVG paths
   const roasPts = roas.map((v, i) => `${xOf(i).toFixed(1)},${yRoas(v).toFixed(1)}`).join(' ');
   const ctrPts  = ctr.map((v, i) => `${xOf(i).toFixed(1)},${yCtr(v).toFixed(1)}`).join(' ');
-
-  // Area fill for ROAS
   const areaPath = `M ${xOf(0).toFixed(1)},${(PAD_T + CH).toFixed(1)} ` +
     roas.map((v, i) => `L ${xOf(i).toFixed(1)},${yRoas(v).toFixed(1)}`).join(' ') +
     ` L ${xOf(23).toFixed(1)},${(PAD_T + CH).toFixed(1)} Z`;
 
-  // Event markers: budget bump at 09:00, creative refresh at 16:00
-  const events = [
-    { hour: 9,  label: 'Budget ↑', color: '#00CC77' },
-    { hour: 16, label: 'Creative', color: '#3B82F6' },
-  ];
-
-  // Y-axis ticks (ROAS)
-  const yTicks = [0, 5, 10, 15, 20];
-  // X-axis labels every 6h
-  const xLabels = [{ h: 0, t: '00:00' }, { h: 6, t: '06:00' }, { h: 12, t: '12:00' }, { h: 18, t: '18:00' }, { h: 23, t: '23:00' }];
-
-  // Current hour marker (21:00 — last data + 2h ago)
-  const nowHour = 21;
+  const events   = [{ hour: 9, label: 'Budget ↑', color: '#00CC77' }, { hour: 16, label: 'Creative', color: '#3B82F6' }];
+  const yTicks   = [0, 5, 10, 15, 20];
+  const xLabels  = [{ h: 0, t: '00:00' }, { h: 6, t: '06:00' }, { h: 12, t: '12:00' }, { h: 18, t: '18:00' }, { h: 23, t: '23:00' }];
+  const nowHour  = 21;
 
   return (
     <div style={{ background: c.bgCard, border: `1px solid ${c.border}`, borderRadius: 8, padding: '14px 18px' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, flexWrap: 'wrap', gap: 8 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <M size={9} color={c.textPri} upper>Ad Signal Analysis</M>
           <span style={{ fontFamily: c.mono, fontSize: 8, color: c.textSec }}>Last 24h · UTC+8</span>
         </div>
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          {/* Legend */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <div style={{ width: 16, height: 1.5, background: c.accent, borderRadius: 1 }} />
             <span style={{ fontFamily: c.mono, fontSize: 8, color: c.textSec, textTransform: 'uppercase', letterSpacing: '0.06em' }}>ROAS</span>
@@ -326,101 +305,55 @@ function WaveformSection() {
             <div style={{ width: 16, height: 1.5, background: '#3B82F6', borderRadius: 1, opacity: 0.7 }} />
             <span style={{ fontFamily: c.mono, fontSize: 8, color: c.textSec, textTransform: 'uppercase', letterSpacing: '0.06em' }}>CTR %</span>
           </div>
-          <span style={{
-            fontFamily: c.mono, fontSize: 8, padding: '3px 7px',
-            background: 'rgba(0,204,119,0.1)', color: '#00CC77',
-            border: '1px solid rgba(0,204,119,0.28)', borderRadius: 3,
-            letterSpacing: '0.1em', textTransform: 'uppercase' as const,
-            display: 'inline-flex', alignItems: 'center', gap: 4,
-          }}>
+          <span style={{ fontFamily: c.mono, fontSize: 8, padding: '3px 7px', background: 'rgba(0,204,119,0.1)', color: '#00CC77', border: '1px solid rgba(0,204,119,0.28)', borderRadius: 3, letterSpacing: '0.1em', textTransform: 'uppercase' as const, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
             <span style={{ width: 4, height: 4, borderRadius: '50%', background: '#00CC77', display: 'inline-block' }} />
             LIVE
           </span>
         </div>
       </div>
-
-      {/* Chart */}
-      <svg width="100%" height={H} viewBox={`0 0 ${W} ${H}`} style={{ display: 'block', overflow: 'visible' }}>
-        <defs>
-          <linearGradient id="roasGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={c.accent} stopOpacity={0.18} />
-            <stop offset="100%" stopColor={c.accent} stopOpacity={0.01} />
-          </linearGradient>
-        </defs>
-
-        {/* Grid lines */}
-        {yTicks.map(v => (
-          <line key={v}
-            x1={PAD_L} y1={yRoas(v).toFixed(1)} x2={W - PAD_R} y2={yRoas(v).toFixed(1)}
-            stroke="rgba(255,255,255,0.04)" strokeWidth={0.75}
-            strokeDasharray={v === 0 ? 'none' : '3,3'}
-          />
-        ))}
-
-        {/* Y-axis labels */}
-        {yTicks.filter(v => v > 0).map(v => (
-          <text key={v} x={PAD_L - 4} y={yRoas(v) + 3} textAnchor="end"
-            fontFamily={c.mono} fontSize={7} fill={c.textMute}>
-            {v}×
-          </text>
-        ))}
-
-        {/* Area fill */}
-        <path d={areaPath} fill="url(#roasGrad)" />
-
-        {/* CTR line */}
-        <polyline points={ctrPts} fill="none" stroke="#3B82F6" strokeWidth={1.2}
-          strokeLinejoin="round" opacity={0.6} strokeDasharray="4,2" />
-
-        {/* ROAS line */}
-        <polyline points={roasPts} fill="none" stroke={c.accent} strokeWidth={1.8}
-          strokeLinejoin="round" opacity={0.92}
-          style={{ filter: `drop-shadow(0 0 3px rgba(0,177,162,0.5))` }} />
-
-        {/* ROAS dots at key hours */}
-        {[6, 11, 17, 21].map(h => (
-          <circle key={h} cx={xOf(h)} cy={yRoas(roas[h])} r={2.5}
-            fill={c.bgCard} stroke={c.accent} strokeWidth={1.5} />
-        ))}
-
-        {/* Event markers */}
-        {events.map(ev => (
-          <g key={ev.hour}>
-            <line
-              x1={xOf(ev.hour)} y1={PAD_T} x2={xOf(ev.hour)} y2={PAD_T + CH}
-              stroke={ev.color} strokeWidth={0.8} strokeDasharray="3,2" opacity={0.55} />
-            <rect x={xOf(ev.hour) - 22} y={PAD_T - 1} width={44} height={13} rx={3}
-              fill={`${ev.color}18`} />
-            <text x={xOf(ev.hour)} y={PAD_T + 8} textAnchor="middle"
-              fontFamily={c.mono} fontSize={7} fill={ev.color} opacity={0.9}>
-              {ev.label}
-            </text>
-          </g>
-        ))}
-
-        {/* Now marker */}
-        <line x1={xOf(nowHour)} y1={PAD_T} x2={xOf(nowHour)} y2={PAD_T + CH}
-          stroke="rgba(255,255,255,0.15)" strokeWidth={1} />
-        <text x={xOf(nowHour)} y={PAD_T + CH + 14} textAnchor="middle"
-          fontFamily={c.mono} fontSize={7} fill={c.textSec}>NOW</text>
-
-        {/* X-axis labels */}
-        {xLabels.map(({ h, t }) => (
-          h === nowHour ? null :
-          <text key={h} x={xOf(h)} y={PAD_T + CH + 14} textAnchor="middle"
-            fontFamily={c.mono} fontSize={7} fill={c.textMute}>{t}</text>
-        ))}
-      </svg>
-
-      {/* Metric row */}
-      <div style={{ display: 'flex', gap: 20, marginTop: 10, paddingTop: 10, borderTop: `1px solid ${c.border}` }}>
+      <div ref={containerRef} style={{ width: '100%' }}>
+        <svg width={W} height={H} viewBox={`0 0 ${W} ${H}`} style={{ display: 'block', width: '100%', height: 'auto', overflow: 'visible' }}>
+          <defs>
+            <linearGradient id="roasGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={c.accent} stopOpacity={0.18} />
+              <stop offset="100%" stopColor={c.accent} stopOpacity={0.01} />
+            </linearGradient>
+          </defs>
+          {yTicks.map(v => (
+            <line key={v} x1={PAD_L} y1={yRoas(v).toFixed(1)} x2={W - PAD_R} y2={yRoas(v).toFixed(1)}
+              stroke="rgba(255,255,255,0.04)" strokeWidth={0.75} strokeDasharray={v === 0 ? 'none' : '3,3'} />
+          ))}
+          {yTicks.filter(v => v > 0).map(v => (
+            <text key={v} x={PAD_L - 4} y={yRoas(v) + 3} textAnchor="end" fontFamily={c.mono} fontSize={7} fill={c.textMute}>{v}×</text>
+          ))}
+          <path d={areaPath} fill="url(#roasGrad)" />
+          <polyline points={ctrPts} fill="none" stroke="#3B82F6" strokeWidth={1.2} strokeLinejoin="round" opacity={0.6} strokeDasharray="4,2" />
+          <polyline points={roasPts} fill="none" stroke={c.accent} strokeWidth={1.8} strokeLinejoin="round" opacity={0.92} style={{ filter: `drop-shadow(0 0 3px rgba(0,177,162,0.5))` }} />
+          {[6, 11, 17, 21].map(h => (
+            <circle key={h} cx={xOf(h)} cy={yRoas(roas[h])} r={2.5} fill={c.bgCard} stroke={c.accent} strokeWidth={1.5} />
+          ))}
+          {events.map(ev => (
+            <g key={ev.hour}>
+              <line x1={xOf(ev.hour)} y1={PAD_T} x2={xOf(ev.hour)} y2={PAD_T + CH} stroke={ev.color} strokeWidth={0.8} strokeDasharray="3,2" opacity={0.55} />
+              <rect x={xOf(ev.hour) - 26} y={PAD_T - 1} width={52} height={13} rx={3} fill={`${ev.color}18`} />
+              <text x={xOf(ev.hour)} y={PAD_T + 8} textAnchor="middle" fontFamily={c.mono} fontSize={7} fill={ev.color} opacity={0.9}>{ev.label}</text>
+            </g>
+          ))}
+          <line x1={xOf(nowHour)} y1={PAD_T} x2={xOf(nowHour)} y2={PAD_T + CH} stroke="rgba(255,255,255,0.15)" strokeWidth={1} />
+          <text x={xOf(nowHour)} y={PAD_T + CH + 14} textAnchor="middle" fontFamily={c.mono} fontSize={7} fill={c.textSec}>NOW</text>
+          {xLabels.map(({ h, t }) => h === nowHour ? null : (
+            <text key={h} x={xOf(h)} y={PAD_T + CH + 14} textAnchor="middle" fontFamily={c.mono} fontSize={7} fill={c.textMute}>{t}</text>
+          ))}
+        </svg>
+      </div>
+      <div style={{ display: 'flex', gap: 20, marginTop: 10, paddingTop: 10, borderTop: `1px solid ${c.border}`, flexWrap: 'wrap' }}>
         {[
-          { label: 'Peak ROAS',  val: `${Math.max(...roas).toFixed(1)}×`, sub: '17:00', up: true },
-          { label: 'Avg ROAS',   val: `${(roas.reduce((a,b)=>a+b,0)/roas.length).toFixed(1)}×`, sub: '24h avg' },
-          { label: 'Peak CTR',   val: `${Math.max(...ctr).toFixed(1)}%`,  sub: '17:00', up: true },
-          { label: 'Avg CTR',    val: `${(ctr.reduce((a,b)=>a+b,0)/ctr.length).toFixed(2)}%`,  sub: '24h avg' },
-          { label: 'Signals',    val: '74', sub: 'Active ads' },
-          { label: 'Anomalies',  val: '0',  sub: 'Last 24h' },
+          { label: 'Peak ROAS', val: `${Math.max(...roas).toFixed(1)}×`, sub: '17:00', up: true },
+          { label: 'Avg ROAS',  val: `${(roas.reduce((a,b)=>a+b,0)/roas.length).toFixed(1)}×`, sub: '24h avg' },
+          { label: 'Peak CTR',  val: `${Math.max(...ctr).toFixed(1)}%`,  sub: '17:00', up: true },
+          { label: 'Avg CTR',   val: `${(ctr.reduce((a,b)=>a+b,0)/ctr.length).toFixed(2)}%`,  sub: '24h avg' },
+          { label: 'Signals',   val: '74', sub: 'Active ads' },
+          { label: 'Anomalies', val: '0',  sub: 'Last 24h' },
         ].map(m => (
           <div key={m.label}>
             <div style={{ fontFamily: c.mono, fontSize: 8, color: c.textMute, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 3 }}>{m.label}</div>
@@ -556,12 +489,12 @@ const miniWaveform = (() => {
   const roasBase = [3.8,3.2,2.9,2.7,3.1,4.2,6.8,9.4,12.1,14.8,16.2,17.1,15.4,13.8,12.9,14.2,16.8,18.3,17.6,15.2,12.4,9.8,7.1,5.2];
   const ctrBase  = [0.8,0.7,0.6,0.6,0.8,1.1,1.8,2.4,3.1,3.6,3.9,4.1,3.7,3.2,3.0,3.4,4.0,4.3,4.1,3.5,2.8,2.1,1.5,1.1];
   const xOf = (i: number) => PAD_L + (i / 23) * CW;
-  const yRoas = (v: number) => PAD_T + CH - (v / 22) * CH;
-  const yCtr  = (v: number) => PAD_T + CH - (v / 5.5) * CH;
-  const roasPts = roasBase.map((v, i) => `${xOf(i).toFixed(1)},${yRoas(v).toFixed(1)}`).join(' ');
-  const ctrPts  = ctrBase.map((v, i) => `${xOf(i).toFixed(1)},${yCtr(v).toFixed(1)}`).join(' ');
-  const areaPath = `M ${xOf(0).toFixed(1)},${(PAD_T + CH).toFixed(1)} ` +
-    roasBase.map((v, i) => `L ${xOf(i).toFixed(1)},${yRoas(v).toFixed(1)}`).join(' ') +
+  const yR  = (v: number) => PAD_T + CH - (v / 22) * CH;
+  const yC  = (v: number) => PAD_T + CH - (v / 5.5) * CH;
+  const rPts = roasBase.map((v, i) => `${xOf(i).toFixed(1)},${yR(v).toFixed(1)}`).join(' ');
+  const cPts = ctrBase.map((v, i) => `${xOf(i).toFixed(1)},${yC(v).toFixed(1)}`).join(' ');
+  const area = `M ${xOf(0).toFixed(1)},${(PAD_T + CH).toFixed(1)} ` +
+    roasBase.map((v, i) => `L ${xOf(i).toFixed(1)},${yR(v).toFixed(1)}`).join(' ') +
     ` L ${xOf(23).toFixed(1)},${(PAD_T + CH).toFixed(1)} Z`;
   return (
     <svg width="100%" height={h} viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" style={{ display: 'block' }}>
@@ -571,9 +504,9 @@ const miniWaveform = (() => {
           <stop offset="100%" stopColor={c.accent} stopOpacity={0.01} />
         </linearGradient>
       </defs>
-      <path d={areaPath} fill="url(#mwGrad)" />
-      <polyline points={ctrPts} fill="none" stroke="#3B82F6" strokeWidth="1.2" strokeLinejoin="round" opacity={0.55} strokeDasharray="3,2" />
-      <polyline points={roasPts} fill="none" stroke={c.accent} strokeWidth="1.8" strokeLinejoin="round" opacity={0.92}
+      <path d={area} fill="url(#mwGrad)" />
+      <polyline points={cPts} fill="none" stroke="#3B82F6" strokeWidth="1.2" strokeLinejoin="round" opacity={0.55} strokeDasharray="3,2" />
+      <polyline points={rPts} fill="none" stroke={c.accent} strokeWidth="1.8" strokeLinejoin="round" opacity={0.92}
         style={{ filter: `drop-shadow(0 0 3px rgba(0,177,162,0.5))` }} />
     </svg>
   );
@@ -606,12 +539,12 @@ const miniGlobe = (() => {
 
 // ── Module registry ───────────────────────────────────────────────────────────
 export const DASH_MODULES: Record<string, { label: string; preview: React.ReactNode }> = {
-  'campaigns':   { label: 'Campaign Performance',   preview: miniCampaigns },
-  'roas-chart':  { label: 'ROAS Benchmark',          preview: miniRoasChart },
-  'system-health': { label: 'System Health',         preview: miniHealth },
-  'live-stats':  { label: 'Account Status',          preview: miniLiveStats },
-  'waveform':    { label: 'Ad Signal Analysis',      preview: miniWaveform },
-  'globe':       { label: 'Audience Distribution',   preview: miniGlobe },
+  'campaigns':     { label: 'Campaign Performance',  preview: miniCampaigns  },
+  'roas-chart':    { label: 'ROAS Benchmark',         preview: miniRoasChart  },
+  'system-health': { label: 'System Health',          preview: miniHealth     },
+  'live-stats':    { label: 'Account Status',         preview: miniLiveStats  },
+  'waveform':      { label: 'Ad Signal Analysis',     preview: miniWaveform   },
+  'globe':         { label: 'Audience Distribution',  preview: miniGlobe      },
 };
 
 // ── Selectable wrapper ────────────────────────────────────────────────────────
@@ -665,22 +598,14 @@ export function DashboardContent({
           <M size={9} color={c.textMute} style={{ marginLeft: 12 }}>LSN Test · Meta Ads</M>
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          {/* Aggregate badges */}
-          {[
-            { label: '5 Campaigns' },
-            { label: '74 Ad Sets' },
-            { label: `Avg ROAS ${AVG_ROAS}×` },
-          ].map(b => (
+          {[{ label: '5 Campaigns' }, { label: '74 Ad Sets' }, { label: `Avg ROAS ${AVG_ROAS}×` }].map(b => (
             <span key={b.label} style={{ fontFamily: c.mono, fontSize: 9, padding: '3px 8px', background: 'rgba(0,177,162,0.07)', color: c.accent, border: `1px solid rgba(0,177,162,0.2)`, borderRadius: 3, letterSpacing: '0.08em' }}>
               {b.label}
             </span>
           ))}
-          <button style={{
-            fontFamily: c.mono, fontSize: 10, padding: '7px 14px',
-            background: 'transparent', border: `1px solid ${c.borderStrong}`,
-            borderRadius: 5, color: c.accent, cursor: 'pointer',
-            textTransform: 'uppercase', letterSpacing: '0.08em',
-          }}>Export CSV</button>
+          <button style={{ fontFamily: c.mono, fontSize: 10, padding: '7px 14px', background: 'transparent', border: `1px solid ${c.borderStrong}`, borderRadius: 5, color: c.accent, cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            Export CSV
+          </button>
         </div>
       </div>
 
@@ -689,14 +614,11 @@ export function DashboardContent({
 
         {/* ── Left column (fixed 420px) ── */}
         <div style={{ width: 420, flexShrink: 0, display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {/* Campaign performance (table + alert note) as one block */}
           <Sel id="campaigns" selectedId={selectedId} onSelect={onSelect}>
             <div style={{ background: c.bgCard, border: `1px solid ${c.border}`, borderRadius: 8, overflow: 'hidden' }}>
               <CampaignPerformance />
             </div>
           </Sel>
-
-          {/* System health */}
           <Sel id="system-health" selectedId={selectedId} onSelect={onSelect}>
             <SystemHealth />
           </Sel>
@@ -704,7 +626,6 @@ export function DashboardContent({
 
         {/* ── Right column (flex) ── */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 14, minWidth: 0 }}>
-          {/* ROAS benchmark + live stats row */}
           <div style={{ display: 'flex', gap: 14, alignItems: 'stretch', height: 200 }}>
             <Sel id="roas-chart" selectedId={selectedId} onSelect={onSelect} style={{ flex: 1 }}>
               <RoasBenchmark />
@@ -713,13 +634,9 @@ export function DashboardContent({
               <LiveStats />
             </Sel>
           </div>
-
-          {/* Waveform */}
           <Sel id="waveform" selectedId={selectedId} onSelect={onSelect}>
             <WaveformSection />
           </Sel>
-
-          {/* Globe */}
           <Sel id="globe" selectedId={selectedId} onSelect={onSelect}>
             <GlobeViz />
           </Sel>
