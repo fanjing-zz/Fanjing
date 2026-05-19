@@ -15,35 +15,35 @@ const Mono = ({ children, size = 11, color = c.textSec, upper = false, bold = fa
   }}>{children}</span>
 );
 
-// Corner-bracket panel wrapper
-function BracketPanel({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
-  const S = 16, T = 1.5, col = c.borderStrong;
-  const corner = (pos: React.CSSProperties): React.CSSProperties => ({
-    position: 'absolute', width: S, height: S, pointerEvents: 'none', ...pos,
-  });
+// Selectable wrapper — same interaction as Dashboard modules
+function Sel({ id, selectedId, onSelect, children, style }: {
+  id: string; selectedId: string | null;
+  onSelect: (id: string) => void;
+  children: React.ReactNode;
+  style?: React.CSSProperties;
+}) {
+  const [hov, setHov] = React.useState(false);
+  const active = selectedId === id;
   return (
-    <div style={{ position: 'relative', ...style }}>
-      {/* TL */ }
-      <div style={corner({ top: 0, left: 0 })}>
-        <div style={{ position: 'absolute', top: 0, left: 0, width: S, height: T, background: col }} />
-        <div style={{ position: 'absolute', top: 0, left: 0, width: T, height: S, background: col }} />
-      </div>
-      {/* TR */}
-      <div style={corner({ top: 0, right: 0 })}>
-        <div style={{ position: 'absolute', top: 0, right: 0, width: S, height: T, background: col }} />
-        <div style={{ position: 'absolute', top: 0, right: 0, width: T, height: S, background: col }} />
-      </div>
-      {/* BL */}
-      <div style={corner({ bottom: 0, left: 0 })}>
-        <div style={{ position: 'absolute', bottom: 0, left: 0, width: S, height: T, background: col }} />
-        <div style={{ position: 'absolute', bottom: 0, left: 0, width: T, height: S, background: col }} />
-      </div>
-      {/* BR */}
-      <div style={corner({ bottom: 0, right: 0 })}>
-        <div style={{ position: 'absolute', bottom: 0, right: 0, width: S, height: T, background: col }} />
-        <div style={{ position: 'absolute', bottom: 0, right: 0, width: T, height: S, background: col }} />
-      </div>
+    <div
+      onClick={() => onSelect(id)}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        cursor: 'pointer', borderRadius: 8, position: 'relative',
+        boxShadow: active
+          ? `0 0 0 1px rgba(0,177,162,0.5), 0 0 24px rgba(0,177,162,0.08)`
+          : hov ? `0 0 0 1px rgba(0,177,162,0.18)` : 'none',
+        transition: 'box-shadow 0.2s',
+        ...style,
+      }}
+    >
       {children}
+      <div style={{
+        position: 'absolute', inset: 0, borderRadius: 8, pointerEvents: 'none',
+        background: 'rgba(0,177,162,0.03)',
+        opacity: active ? 1 : 0, transition: 'opacity 0.22s',
+      }} />
     </div>
   );
 }
@@ -56,15 +56,15 @@ const campaigns = [
   { id: 'camp.echo',    code: 'BK-ECHO',  adSets: 15, ads: 15, dotColor: '#888' },
   { id: 'camp.horizon', code: 'BK-HRZ',   adSets: 14, ads: 14, dotColor: '#888' },
 ];
-const TOTAL_SETS = campaigns.reduce((s, cp) => s + cp.adSets, 0); // 74
-const TOTAL_ADS  = campaigns.reduce((s, cp) => s + cp.ads, 0);    // 74
+const TOTAL_SETS = campaigns.reduce((s, cp) => s + cp.adSets, 0);
+const TOTAL_ADS  = campaigns.reduce((s, cp) => s + cp.ads, 0);
 
 // ─── Stat Box ─────────────────────────────────────────────────────────────────
 function StatBox({ val, label, active }: { val: string; label: string; active?: boolean }) {
   return (
     <div style={{
       border: `1px solid ${active ? c.accent : c.border}`,
-      borderRadius: 6, padding: '10px 18px', textAlign: 'center', minWidth: 76,
+      borderRadius: 8, padding: '10px 18px', textAlign: 'center', minWidth: 76,
       background: active ? `rgba(0,177,162,0.07)` : c.bgCard,
     }}>
       <div style={{ fontFamily: c.mono, fontSize: 22, fontWeight: 700, color: active ? c.accent : c.textPri, lineHeight: 1.1 }}>{val}</div>
@@ -83,8 +83,8 @@ function SubmissionFunnel() {
     { label: 'CREATIVES', val: 74, desc: '1080²',            pct: 44 },
   ];
   return (
-    <BracketPanel style={{ flex: 1, background: c.bgCard, borderRadius: 4, padding: '18px 20px 18px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+    <div style={{ flex: 1, background: c.bgCard, border: `1px solid ${c.border}`, borderRadius: 8, padding: '16px 20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <Mono size={7} color={c.textMute} upper>VIS · 04A</Mono>
           <Mono size={10} color={c.textPri} bold>Submission funnel</Mono>
@@ -107,14 +107,14 @@ function SubmissionFunnel() {
             <div style={{ height: 5, background: 'rgba(255,255,255,0.05)', borderRadius: 3, overflow: 'hidden' }}>
               <div style={{ height: '100%', width: `${row.pct}%`, background: c.accent, opacity: 0.4, borderRadius: 3 }} />
             </div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, minWidth: 130, justifyContent: 'flex-end' }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, minWidth: 140, justifyContent: 'flex-end' }}>
               <Mono size={11} color={c.textPri} bold>{row.val}</Mono>
               <Mono size={8} color={c.textMute}>× {row.desc}</Mono>
             </div>
           </div>
         ))}
       </div>
-    </BracketPanel>
+    </div>
   );
 }
 
@@ -128,8 +128,8 @@ function StatusMix() {
     { label: 'FAILED',  val: 0,  color: '#EF4444' },
   ];
   return (
-    <BracketPanel style={{ width: 252, flexShrink: 0, background: c.bgCard, borderRadius: 4, padding: '18px 20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+    <div style={{ width: 252, flexShrink: 0, background: c.bgCard, border: `1px solid ${c.border}`, borderRadius: 8, padding: '16px 20px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <Mono size={7} color={c.textMute} upper>VIS · 04B</Mono>
           <Mono size={10} color={c.textPri} bold>Status mix</Mono>
@@ -138,7 +138,7 @@ function StatusMix() {
       </div>
       <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
         <svg width={104} height={104} viewBox="0 0 104 104" style={{ flexShrink: 0 }}>
-          <circle cx={CX} cy={CY} r={R} fill="none" stroke="#444" strokeWidth={11} />
+          <circle cx={CX} cy={CY} r={R} fill="none" stroke="#3a3a3a" strokeWidth={11} />
           <circle cx={CX} cy={CY} r={R} fill="none" stroke="#555" strokeWidth={11}
             strokeDasharray={`${2 * Math.PI * R} 0`} />
           <text x={CX} y={CY + 7} textAnchor="middle" fontFamily={c.mono} fontSize={19} fontWeight={700} fill={c.textSec}>74</text>
@@ -155,20 +155,18 @@ function StatusMix() {
           ))}
         </div>
       </div>
-    </BracketPanel>
+    </div>
   );
 }
 
 // ─── Campaign Tree ─────────────────────────────────────────────────────────────
 function CampaignTree() {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
-
   const toggle = (id: string) =>
     setExpanded(prev => { const n = new Set(prev); n.has(id) ? n.delete(id) : n.add(id); return n; });
 
   return (
-    <BracketPanel style={{ background: c.bgCard, borderRadius: 4, overflow: 'hidden' }}>
-      {/* Header */}
+    <div style={{ background: c.bgCard, border: `1px solid ${c.border}`, borderRadius: 8, overflow: 'hidden' }}>
       <div style={{
         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
         padding: '10px 18px', borderBottom: `1px solid ${c.border}`,
@@ -188,12 +186,10 @@ function CampaignTree() {
           num: String(i + 1).padStart(2, '0'),
           name: `adset.${prefix}.${String(i + 1).padStart(2, '0')}`,
         }));
-
         return (
           <div key={camp.id}>
-            {/* Campaign row */}
             <div
-              onClick={() => toggle(camp.id)}
+              onClick={e => { e.stopPropagation(); toggle(camp.id); }}
               style={{
                 display: 'flex', alignItems: 'center', gap: 12, padding: '11px 18px',
                 cursor: 'pointer', borderBottom: `1px solid ${c.border}`,
@@ -225,12 +221,10 @@ function CampaignTree() {
                 marginLeft: 8, flexShrink: 0,
               }}>Pause</span>
             </div>
-
-            {/* Ad set rows */}
             {isOpen && (
               <div style={{ borderBottom: `1px solid ${c.border}` }}>
                 {adSets.map((as, ai) => (
-                  <div key={as.num} style={{
+                  <div key={as.num} onClick={e => e.stopPropagation()} style={{
                     display: 'flex', alignItems: 'center', gap: 10,
                     padding: '6px 18px 6px 44px',
                     background: ai % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.01)',
@@ -254,12 +248,81 @@ function CampaignTree() {
           </div>
         );
       })}
-    </BracketPanel>
+    </div>
   );
 }
 
+// ─── Mini previews ────────────────────────────────────────────────────────────
+const miniFunnel = (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%' }}>
+    {[
+      { label: 'Plans',     val: 5,  pct: 6  },
+      { label: 'Campaigns', val: 5,  pct: 6  },
+      { label: 'Ad Sets',   val: 74, pct: 44 },
+      { label: 'Ads',       val: 74, pct: 44 },
+      { label: 'Creatives', val: 74, pct: 44 },
+    ].map(r => (
+      <div key={r.label} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ fontFamily: c.mono, fontSize: 8, color: c.textMute, width: 56, flexShrink: 0 }}>{r.label}</span>
+        <div style={{ flex: 1, height: 4, background: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
+          <div style={{ height: '100%', width: `${r.pct}%`, background: c.accent, opacity: 0.4, borderRadius: 2 }} />
+        </div>
+        <span style={{ fontFamily: c.mono, fontSize: 9, color: c.textPri, minWidth: 16, textAlign: 'right' }}>{r.val}</span>
+      </div>
+    ))}
+  </div>
+);
+
+const miniStatusMix = (
+  <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+    <svg width={56} height={56} viewBox="0 0 56 56">
+      <circle cx={28} cy={28} r={20} fill="none" stroke="#3a3a3a" strokeWidth={8} />
+      <circle cx={28} cy={28} r={20} fill="none" stroke="#555" strokeWidth={8} />
+      <text x={28} y={33} textAnchor="middle" fontFamily={c.mono} fontSize={11} fontWeight={700} fill={c.textSec}>74</text>
+    </svg>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+      {[['LIVE', '0', c.accent], ['PAUSED', '74', '#555'], ['PENDING', '0', '#F59E0B'], ['FAILED', '0', '#EF4444']].map(([l, v, col]) => (
+        <div key={l} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          <span style={{ width: 6, height: 6, borderRadius: 1, background: col as string, display: 'inline-block' }} />
+          <span style={{ fontFamily: c.mono, fontSize: 8, color: c.textMute }}>{l}</span>
+          <span style={{ fontFamily: c.mono, fontSize: 9, color: c.textSec, marginLeft: 'auto' }}>{v}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+const miniTree = (
+  <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+    {campaigns.slice(0, 4).map(cp => (
+      <div key={cp.id} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <span style={{ width: 6, height: 6, borderRadius: '50%', background: cp.dotColor, display: 'inline-block', flexShrink: 0 }} />
+        <span style={{ fontFamily: c.mono, fontSize: 9, color: c.textPri, flex: 1 }}>{cp.id}</span>
+        <span style={{ fontFamily: c.mono, fontSize: 8, color: c.textMute }}>{cp.code}</span>
+        <span style={{ fontFamily: c.mono, fontSize: 8, color: c.textSec }}>{cp.adSets} sets</span>
+      </div>
+    ))}
+    <span style={{ fontFamily: c.mono, fontSize: 8, color: c.textMute, marginTop: 2 }}>+1 more · {TOTAL_SETS} ad sets total</span>
+  </div>
+);
+
+// ─── Module registry (used by LanbowApp) ─────────────────────────────────────
+export const CAMPAIGN_MODULES: Record<string, { label: string; preview: React.ReactNode }> = {
+  'camp-funnel':     { label: 'Submission Funnel', preview: miniFunnel     },
+  'camp-status-mix': { label: 'Status Mix',        preview: miniStatusMix  },
+  'camp-tree':       { label: 'Campaign Tree',     preview: miniTree       },
+};
+
 // ─── Main ─────────────────────────────────────────────────────────────────────
-export function CampaignsContent({ onUploadAssets: _onUploadAssets }: { onUploadAssets?: () => void }) {
+export function CampaignsContent({
+  onSelect,
+  selectedId,
+  onUploadAssets: _onUploadAssets,
+}: {
+  onSelect: (id: string) => void;
+  selectedId: string | null;
+  onUploadAssets?: () => void;
+}) {
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'auto', background: c.bgBase }}>
 
@@ -301,7 +364,7 @@ export function CampaignsContent({ onUploadAssets: _onUploadAssets }: { onUpload
         {/* ── Title + Stat Boxes ── */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
           <div>
-            <div style={{ fontFamily: c.mono, fontSize: 22, fontWeight: 700, color: c.textPri, letterSpacing: '0.02em', marginBottom: 6 }}>
+            <div style={{ fontFamily: c.sans, fontSize: 17, fontWeight: 700, color: c.textPri, marginBottom: 6 }}>
               Campaigns submitted
             </div>
             <Mono size={9} color={c.textMute}>
@@ -309,21 +372,27 @@ export function CampaignsContent({ onUploadAssets: _onUploadAssets }: { onUpload
             </Mono>
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
-            <StatBox val="5"              label="Campaigns" active />
-            <StatBox val={String(TOTAL_SETS)} label="Ad Sets" />
-            <StatBox val={String(TOTAL_ADS)}  label="Ads" />
-            <StatBox val={`$${TOTAL_SETS}`}   label="Daily" />
+            <StatBox val="5"                   label="Campaigns" active />
+            <StatBox val={String(TOTAL_SETS)}  label="Ad Sets" />
+            <StatBox val={String(TOTAL_ADS)}   label="Ads" />
+            <StatBox val={`$${TOTAL_SETS}`}    label="Daily" />
           </div>
         </div>
 
         {/* ── Vis row: Funnel + Status Mix ── */}
         <div style={{ display: 'flex', gap: 16, alignItems: 'stretch' }}>
-          <SubmissionFunnel />
-          <StatusMix />
+          <Sel id="camp-funnel" selectedId={selectedId} onSelect={onSelect} style={{ flex: 1 }}>
+            <SubmissionFunnel />
+          </Sel>
+          <Sel id="camp-status-mix" selectedId={selectedId} onSelect={onSelect}>
+            <StatusMix />
+          </Sel>
         </div>
 
         {/* ── Campaign Tree ── */}
-        <CampaignTree />
+        <Sel id="camp-tree" selectedId={selectedId} onSelect={onSelect}>
+          <CampaignTree />
+        </Sel>
 
       </div>
     </div>

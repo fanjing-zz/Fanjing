@@ -6,6 +6,7 @@ import { CampaignsContent }  from './CampaignsContent';
 import { CreativeContent }   from './CreativeContent';
 import { SettingsContent }   from './SettingsContent';
 import { DashboardContent, DASH_MODULES }  from './DashboardContent';
+import { CAMPAIGN_MODULES } from './CampaignsContent';
 import { ChatMsg, getAgentResponse } from './agentLogic';
 import { LandingPage }      from './LandingPage';
 import { OnboardingTour }   from './OnboardingTour';
@@ -1191,7 +1192,7 @@ export function LanbowApp() {
   const handleSelectModule = (id: string) => {
     // Toggle off if clicking the same module
     if (selectedModule?.id === id) { setSelectedModule(null); return; }
-    const mod = DASH_MODULES[id];
+    const mod = DASH_MODULES[id] ?? CAMPAIGN_MODULES[id];
     if (mod) setSelectedModule({ id, label: mod.label, preview: mod.preview });
   };
 
@@ -1223,7 +1224,13 @@ export function LanbowApp() {
         {/* Main content area — position:relative so FloatingChat anchors to it */}
         <div style={{ flex: 1, display: 'flex', position: 'relative', minWidth: 0, overflow: 'hidden' }}>
           {page === 'chat'      && <CommChatContent msgs={chatMsgs} typing={typing} onAuthorize={() => setAuthorized(true)} />}
-          {page === 'campaigns' && <CampaignsContent onUploadAssets={handleUploadAssets} />}
+          {page === 'campaigns' && (
+            <CampaignsContent
+              onSelect={handleSelectModule}
+              selectedId={selectedModule?.id ?? null}
+              onUploadAssets={handleUploadAssets}
+            />
+          )}
           {page === 'dashboard' && (
             <DashboardContent
               onSelect={handleSelectModule}
