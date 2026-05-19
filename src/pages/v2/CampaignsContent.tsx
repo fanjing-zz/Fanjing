@@ -128,7 +128,7 @@ function StatusMix() {
     { label: 'FAILED',  val: 0,  color: '#EF4444' },
   ];
   return (
-    <div style={{ width: 252, flexShrink: 0, background: c.bgCard, border: `1px solid ${c.border}`, borderRadius: 8, padding: '16px 20px' }}>
+    <div style={{ width: 252, flexShrink: 0, background: c.bgCard, border: `1px solid ${c.border}`, borderRadius: 8, padding: '16px 20px', boxSizing: 'border-box', height: '100%' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <Mono size={7} color={c.textMute} upper>VIS · 04B</Mono>
@@ -384,7 +384,7 @@ export function CampaignsContent({
           <Sel id="camp-funnel" selectedId={selectedId} onSelect={onSelect} style={{ flex: 1 }}>
             <SubmissionFunnel />
           </Sel>
-          <Sel id="camp-status-mix" selectedId={selectedId} onSelect={onSelect}>
+          <Sel id="camp-status-mix" selectedId={selectedId} onSelect={onSelect} style={{ display: 'flex', flexDirection: 'column' }}>
             <StatusMix />
           </Sel>
         </div>
