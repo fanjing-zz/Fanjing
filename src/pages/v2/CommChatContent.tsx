@@ -1110,129 +1110,295 @@ function DownloadReportRow() {
 }
 
 function buildReportHTML(): string {
-  return `<!DOCTYPE html>
+  return `<!doctype html>
 <html lang="zh">
 <head>
-<meta charset="UTF-8"/>
+<meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>drama W20 投放复盘 · 2026-05-13 → 2026-05-19</title>
+<title>drama 投放复盘 — W20 · 2026-05-13 → 2026-05-19</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{background:#071015;color:#BDD8E8;font-family:'Liberation Mono','Space Mono','Courier New',monospace;padding:40px 48px;line-height:1.6}
-  h1{font-size:24px;font-weight:800;font-family:Inter,system-ui,sans-serif;margin-bottom:6px}
-  h2{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#00B1A2;margin:28px 0 12px;border-bottom:1px solid rgba(0,177,162,.12);padding-bottom:6px}
-  .meta{font-size:10px;color:#3D6575;margin-bottom:4px}
-  .kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:0}
-  .kpi{border-radius:8px;padding:16px 18px;border:1px solid}
-  .kpi .label{font-size:8px;text-transform:uppercase;letter-spacing:.12em;color:#1E3545;margin-bottom:8px}
-  .kpi .value{font-size:42px;font-weight:200;line-height:1;letter-spacing:-.02em;margin-bottom:8px}
-  .kpi .note{font-size:9px;color:#3D6575}
-  .danger{border-color:rgba(255,68,102,.3);background:rgba(255,68,102,.03)}
-  .warn{border-color:rgba(255,184,0,.3);background:rgba(255,184,0,.03)}
-  .red{color:#FF4466}
-  .amber{color:#FFB800}
-  .green{color:#00CC77}
-  .accent{color:#00B1A2}
-  table{width:100%;border-collapse:collapse;font-size:10px}
-  th{font-size:8px;text-transform:uppercase;letter-spacing:.1em;color:#1E3545;text-align:left;padding:6px 0;border-bottom:1px solid rgba(0,177,162,.08)}
-  td{padding:7px 0;border-bottom:1px solid rgba(0,177,162,.05);color:#3D6575}
-  td.bold{color:#BDD8E8;font-weight:700}
-  .bar-wrap{height:14px;background:rgba(255,255,255,.04);border-radius:3;overflow:hidden}
-  .bar{height:100%;border-radius:3px}
-  .callout{border-left:3px solid #FF4466;padding:10px 14px;background:rgba(255,68,102,.04);border-radius:0 4px 4px 0;margin-top:12px;font-size:10px;color:#FF4466;line-height:1.7}
-  .action-row{display:grid;grid-template-columns:60px 90px 1fr;gap:12px;padding:10px 14px;background:rgba(0,0,0,.18);border:1px solid rgba(0,177,162,.08);border-radius:6px;margin-bottom:6px;align-items:baseline;font-size:10px}
-  .badge-high{background:rgba(255,68,102,.14);color:#FF4466;border:1px solid rgba(255,68,102,.35);border-radius:3px;padding:2px 8px;font-size:8px;text-transform:uppercase;letter-spacing:.06em;text-align:center}
-  .badge-med{background:rgba(255,184,0,.12);color:#FFB800;border:1px solid rgba(255,184,0,.35);border-radius:3px;padding:2px 8px;font-size:8px;text-transform:uppercase;letter-spacing:.06em;text-align:center}
-  .owner{background:rgba(255,255,255,.03);border:1px solid rgba(0,177,162,.08);border-radius:3px;padding:2px 8px;text-align:center;color:#3D6575}
-  .sources{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-  .src{background:rgba(0,0,0,.18);border:1px solid rgba(0,177,162,.08);border-radius:4px;padding:3px 10px;font-size:9px;color:#3D6575;display:inline-flex;align-items:center;gap:6px}
-  .dot{width:5px;height:5px;border-radius:50%;background:#00CC77;flex-shrink:0}
-  footer{margin-top:40px;font-size:9px;color:#1E3545;text-align:center;border-top:1px solid rgba(0,177,162,.06);padding-top:16px}
+  :root {
+    --bg-base:    #071015;
+    --bg-panel:   #0B1720;
+    --bg-card:    #0E1D28;
+    --bg-input:   #091318;
+    --accent:     #00B1A2;
+    --accent-mid: #008E82;
+    --accent-dim: rgba(0,177,162,0.12);
+    --accent-glow:rgba(0,177,162,0.30);
+    --green:  #00CC77;
+    --amber:  #FFB800;
+    --danger: #FF4466;
+    --info:   #3B82F6;
+    --text-pri:  #BDD8E8;
+    --text-sec:  #3D6575;
+    --text-mute: #1E3545;
+    --text-label:#245060;
+    --border:        rgba(0,177,162,0.08);
+    --border-strong: rgba(0,177,162,0.18);
+    --mono: 'Liberation Mono', 'Space Mono', 'Courier New', monospace;
+    --sans: 'Inter', system-ui, sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg-base);color:var(--text-pri);font-family:var(--sans);font-size:13px;line-height:1.55}
+  body{
+    background-image:
+      linear-gradient(rgba(0,177,162,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,177,162,0.035) 1px, transparent 1px);
+    background-size: 32px 32px;
+    background-position: center top;
+  }
+  .wrap{ max-width: 960px; margin: 0 auto; padding: 32px 28px 56px }
+  .hdr{ display:flex; justify-content:space-between; align-items:flex-end; padding-bottom:18px; border-bottom:1px solid var(--border-strong); margin-bottom:24px; gap: 16px }
+  .hdr .title{ font-weight:800; font-size:32px; letter-spacing:0.01em; background: linear-gradient(180deg, #E8F4F0 0%, var(--text-pri) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent }
+  .hdr .sub{ font-family: var(--mono); font-size: 11px; color: var(--text-sec); margin-top:6px }
+  .hdr .strap{ font-family: var(--mono); font-size: 10px; color: var(--text-mute); margin-top:4px; max-width:560px }
+  .hdr .badges{ display:flex; gap:6px; flex-wrap:wrap; align-items:center }
+  .badge{ font-family: var(--mono); font-size: 9px; padding: 4px 9px; background: var(--accent-dim); color: var(--accent); border: 1px solid var(--border-strong); border-radius: 3px; letter-spacing: 0.09em; text-transform: uppercase; white-space: nowrap }
+  .badge.live{ color: var(--green); border-color: rgba(0,204,119,0.30); background: rgba(0,204,119,0.08); display: inline-flex; align-items:center; gap:5px }
+  .badge.live::before{ content:''; width:5px; height:5px; border-radius:50%; background: var(--green); box-shadow: 0 0 6px var(--green) }
+  .hero{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px }
+  .kpi{ background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 18px 18px 16px; position: relative; overflow:hidden }
+  .kpi.danger{ border-color: rgba(255,68,102,0.35); box-shadow: 0 0 32px rgba(255,68,102,0.06) inset }
+  .kpi.warning{ border-color: rgba(255,184,0,0.35); box-shadow: 0 0 32px rgba(255,184,0,0.06) inset }
+  .kpi .lbl{ font-family: var(--mono); font-size: 9px; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px }
+  .kpi .val{ font-family: var(--mono); font-size: 56px; font-weight: 700; line-height: 1; letter-spacing: -0.02em }
+  .kpi .val.danger{ color: var(--danger); text-shadow: 0 0 16px rgba(255,68,102,0.45) }
+  .kpi .val.warning{ color: var(--amber); text-shadow: 0 0 16px rgba(255,184,0,0.45) }
+  .kpi .note{ font-family: var(--mono); font-size: 10px; color: var(--text-sec); margin-top: 10px; line-height:1.5 }
+  .kpi .corner{ position:absolute; top:10px; right:14px; font-family: var(--mono); font-size: 8px; color: var(--text-mute); letter-spacing: 0.12em }
+  .card{ background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 18px; overflow: hidden }
+  .card-head{ display:flex; justify-content:space-between; align-items:center; padding: 12px 18px; border-bottom: 1px solid var(--border); background: rgba(0,177,162,0.02) }
+  .card-head .label{ font-family: var(--mono); font-size: 10px; color: var(--text-pri); text-transform: uppercase; letter-spacing: 0.12em }
+  .card-head .meta{ font-family: var(--mono); font-size: 9px; color: var(--text-sec) }
+  .card-body{ padding: 16px 18px }
+  .funnel{ display:flex; flex-direction: column; gap: 6px; padding: 4px 0 }
+  .frow{ display: grid; grid-template-columns: 170px 1fr 100px 80px; align-items: center; gap: 12px }
+  .frow .step{ font-family: var(--mono); font-size: 11px; color: var(--text-pri) }
+  .frow .bar-wrap{ height: 22px; position: relative; background: rgba(255,255,255,0.03); border-radius: 3px; overflow:hidden }
+  .frow .bar{ height: 100%; background: var(--accent); opacity:0.85; border-radius: 3px; box-shadow: 0 0 12px var(--accent-glow) }
+  .frow .bar.crit{ background: var(--danger); box-shadow: 0 0 14px rgba(255,68,102,0.35) }
+  .frow .cnt{ font-family: var(--mono); font-size: 13px; text-align: right; color: var(--text-pri) }
+  .frow .drop{ font-family: var(--mono); font-size: 11px; text-align: right; color: var(--text-sec) }
+  .frow .drop.crit{ color: var(--danger); font-weight: 700 }
+  .funnel-callout{ margin-top: 14px; padding: 10px 14px; border-left: 3px solid var(--danger); background: rgba(255,68,102,0.06); font-family: var(--mono); font-size: 11px; color: var(--text-pri); line-height: 1.6 }
+  .funnel-callout b{ color: var(--danger) }
+  .conv-line{ display:flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border) }
+  .conv-line .tag{ font-family: var(--mono); font-size: 9px; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.12em }
+  .conv-line .num{ font-family: var(--mono); font-size: 16px; color: var(--accent); font-weight: 700; text-shadow: 0 0 10px var(--accent-glow) }
+  .ad-grid{ display: grid; grid-template-columns: 1fr 1fr; gap: 6px 32px }
+  .ad-row{ display:flex; justify-content: space-between; align-items: baseline; padding: 6px 0; border-bottom: 1px dotted var(--border) }
+  .ad-row .k{ font-family: var(--mono); font-size: 10px; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.08em }
+  .ad-row .v{ font-family: var(--mono); font-size: 13px; color: var(--text-pri) }
+  .ad-row .v.warn{ color: var(--amber) }
+  .ad-row .v.big{ font-size: 15px; color: var(--accent) }
+  .alert-box{ margin-top: 14px; padding: 12px 14px; border-left: 3px solid var(--amber); background: rgba(255,184,0,0.04) }
+  .alert-box .ttl{ font-family: var(--mono); font-size: 10px; color: var(--amber); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px }
+  .alert-box .body{ font-family: var(--mono); font-size: 11px; color: var(--text-pri); line-height: 1.6 }
+  .alert-box .src{ font-family: var(--mono); font-size: 9px; color: var(--text-mute); margin-top: 4px }
+  .country-grid{ display: grid; grid-template-columns: 1.4fr 1fr; gap: 22px }
+  .country-list .crow{ display:grid; grid-template-columns: 50px 1fr 70px 60px; gap:10px; align-items:center; padding:7px 0 }
+  .country-list .name{ font-family: var(--mono); font-size: 11px; color: var(--text-pri) }
+  .country-list .bar-wrap{ height: 8px; background: rgba(255,255,255,0.04); border-radius: 4px; overflow: hidden }
+  .country-list .bar{ height: 100%; background: var(--accent); opacity: 0.75; border-radius: 4px; box-shadow: 0 0 6px var(--accent-glow) }
+  .country-list .min{ font-family: var(--mono); font-size: 10px; color: var(--text-sec); text-align: right }
+  .country-list .pct{ font-family: var(--mono); font-size: 11px; color: var(--accent); text-align: right; font-weight: 700 }
+  .compare-box{ background: rgba(0,0,0,0.18); border:1px dashed var(--border-strong); border-radius:6px; padding: 14px 16px }
+  .compare-box .row{ display:flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px }
+  .compare-box .row .k{ font-family: var(--mono); font-size: 9px; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.1em; min-width: 70px }
+  .compare-box .row .v{ font-family: var(--mono); font-size: 11px; color: var(--text-pri); text-align: right }
+  .compare-box .gap-note{ margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 10px; color: var(--amber); line-height: 1.5 }
+  .gaps{ display: grid; grid-template-columns: 1fr 1fr; gap: 12px }
+  .gap-card{ background: rgba(0,0,0,0.18); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; position: relative }
+  .gap-card.crit{ border-left: 3px solid var(--danger) }
+  .gap-card.warn{ border-left: 3px solid var(--amber) }
+  .gap-card.info{ border-left: 3px solid var(--info) }
+  .gap-card .id{ position:absolute; top: 8px; right: 12px; font-family: var(--mono); font-size: 9px; color: var(--text-mute); letter-spacing: 0.1em }
+  .gap-card .ttl{ font-family: var(--mono); font-size: 12px; color: var(--text-pri); font-weight: 700; margin-bottom: 5px; padding-right: 36px }
+  .gap-card .desc{ font-family: var(--mono); font-size: 10px; color: var(--text-sec); line-height: 1.55 }
+  .actions{ display: flex; flex-direction: column; gap: 8px }
+  .action{ display: grid; grid-template-columns: 70px 100px 1fr; gap: 12px; align-items: center; padding: 11px 14px; background: rgba(0,0,0,0.18); border: 1px solid var(--border); border-radius: 6px }
+  .sev{ font-family: var(--mono); font-size: 9px; font-weight: 700; padding: 3px 8px; border-radius: 3px; text-align: center; letter-spacing: 0.1em }
+  .sev.HIGH{ background: rgba(255,68,102,0.15); color: var(--danger); border: 1px solid rgba(255,68,102,0.4) }
+  .sev.MED { background: rgba(255,184,0,0.12); color: var(--amber); border: 1px solid rgba(255,184,0,0.4) }
+  .sev.LOW { background: rgba(59,130,246,0.12); color: var(--info); border: 1px solid rgba(59,130,246,0.4) }
+  .mod-tag{ font-family: var(--mono); font-size: 10px; color: var(--accent); letter-spacing: 0.08em }
+  .action-text{ font-family: var(--mono); font-size: 11px; color: var(--text-pri); line-height: 1.55 }
+  .sources{ display: flex; flex-wrap: wrap; gap: 14px 22px; padding: 16px 18px; background: rgba(0,177,162,0.02); border: 1px solid var(--border); border-radius: 8px; align-items: center; justify-content: space-between }
+  .src-row{ display:flex; flex-wrap: wrap; gap: 14px 22px; align-items:center }
+  .src{ display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 10px; color: var(--text-sec) }
+  .src::before{ content:''; width: 6px; height: 6px; border-radius:50%; background: var(--green); box-shadow: 0 0 6px var(--green) }
+  .sign{ font-family: var(--mono); font-size: 9px; color: var(--text-mute); letter-spacing: 0.08em }
+  .foot{ text-align:center; margin-top: 28px; padding-top: 16px; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 10px; color: var(--text-mute) }
+  .row-flex{ display:flex; align-items:center; gap: 8px }
 </style>
 </head>
 <body>
-<h1>drama 投放复盘</h1>
-<div class="meta">2026-05-13 → 2026-05-19 · PopularReels &amp; Bestshort (act_800509389474426)</div>
-<div class="meta">数据导向的 7 天产品 + 投放诊断：核心异常 / 漏斗瓶颈 / 流量真相 / 缺口 / 行动</div>
+<div class="wrap">
 
-<h2>MOD-01 · Hero KPIs</h2>
-<div class="kpi-grid">
-  <div class="kpi danger"><div class="label">ROAS</div><div class="value red">0.051×</div><div class="note">投 $1 收 $0.05 · 目标 ROAS = 0.5，差 10×</div></div>
-  <div class="kpi warn"><div class="label">Beacon Coverage Gap</div><div class="value amber">60.8%</div><div class="note">CF Stream 6,847 min vs DB 2,682 min · ≈ 4,165 min 未被记录</div></div>
-  <div class="kpi danger"><div class="label">Paywall → Checkout 流失</div><div class="value red">98%</div><div class="note">296 PaywallView → 6 InitiateCheckout · 几乎没进 Stripe</div></div>
+  <header class="hdr">
+    <div>
+      <div class="title">drama 投放复盘</div>
+      <div class="sub">2026-05-13 → 2026-05-19 · PopularReels &amp; Bestshort (act_800509389474426)</div>
+      <div class="strap">数据导向的 7 天产品 + 投放诊断：核心异常 / 漏斗瓶颈 / 流量真相 / 缺口 / 行动</div>
+    </div>
+    <div class="badges">
+      <span class="badge">W20</span>
+      <span class="badge">7 day window</span>
+      <span class="badge">USD</span>
+      <span class="badge live">data live</span>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="kpi danger">
+      <div class="corner">KPI · 01</div>
+      <div class="lbl">ROAS</div>
+      <div class="val danger">0.051<span style="font-size:32px;opacity:0.7">×</span></div>
+      <div class="note">投 $1 收 $0.05<br/>目标 ROAS = 0.5，差 <b style="color:var(--danger)">10×</b></div>
+    </div>
+    <div class="kpi warning">
+      <div class="corner">KPI · 02</div>
+      <div class="lbl">Beacon Coverage Gap</div>
+      <div class="val warning">60.8<span style="font-size:32px;opacity:0.7">%</span></div>
+      <div class="note">CF Stream 6,847 min vs DB 2,682 min<br/>≈ 4,165 min 真实播放<b style="color:var(--amber)">未被记录</b></div>
+    </div>
+    <div class="kpi danger">
+      <div class="corner">KPI · 03</div>
+      <div class="lbl">Paywall → Checkout 流失</div>
+      <div class="val danger">98<span style="font-size:32px;opacity:0.7">%</span></div>
+      <div class="note">296 PaywallView → 6 InitiateCheckout<br/>看墙的人几乎<b style="color:var(--danger)">没进 Stripe</b></div>
+    </div>
+  </section>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="label">MOD · 02 — 全链路漏斗 7 节点</div>
+      <div class="meta">data: play_sessions + Stripe + recharge_records</div>
+    </div>
+    <div class="card-body">
+      <div class="funnel">
+        <div class="frow"><div class="step">① PageView <span style="color:var(--text-mute);font-size:9px">(proxy)</span></div><div class="bar-wrap"><div class="bar" style="width:100%"></div></div><div class="cnt">1,516</div><div class="drop">—</div></div>
+        <div class="frow"><div class="step">② ViewContent <span style="color:var(--text-mute);font-size:9px">(proxy)</span></div><div class="bar-wrap"><div class="bar" style="width:100%"></div></div><div class="cnt">1,516</div><div class="drop">0.0%</div></div>
+        <div class="frow"><div class="step">③ PlayStart</div><div class="bar-wrap"><div class="bar" style="width:61.3%"></div></div><div class="cnt">930</div><div class="drop">−38.7%</div></div>
+        <div class="frow"><div class="step">④ WatchProgress</div><div class="bar-wrap"><div class="bar" style="width:20.9%"></div></div><div class="cnt">317</div><div class="drop">−65.9%</div></div>
+        <div class="frow"><div class="step">⑤ PaywallView <span style="color:var(--text-mute);font-size:9px">(proxy)</span></div><div class="bar-wrap"><div class="bar" style="width:19.5%"></div></div><div class="cnt">296</div><div class="drop">−6.6%</div></div>
+        <div class="frow"><div class="step">⑥ InitiateCheckout</div><div class="bar-wrap"><div class="bar crit" style="width:0.4%"></div></div><div class="cnt" style="color:var(--danger)">6</div><div class="drop crit">−98.0%</div></div>
+        <div class="frow"><div class="step">⑦ Purchase</div><div class="bar-wrap"><div class="bar" style="width:0.13%"></div></div><div class="cnt">2</div><div class="drop">−66.7%</div></div>
+      </div>
+      <div class="funnel-callout">
+        <b>主要漏洞：</b>⑤→⑥ 流失 <b>98%</b>。看到付费墙 296 人，真正点 Stripe 跳转 <b>只有 6</b>。
+        高度怀疑：(1) iOS Safari / 微信 in-app browser 拦截跳转；(2) LockedOverlay 的 CTA 按钮在 desktop 没渲染或被遮挡。
+      </div>
+      <div class="conv-line">
+        <span class="tag">整体转化率（Click → Purchase）</span>
+        <span class="num">0.13%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="label">MOD · 03 — Meta 投放数据（primary 账号）</div>
+      <div class="meta">act_800509389474426 · USD · 7d</div>
+    </div>
+    <div class="card-body">
+      <div class="ad-grid">
+        <div class="ad-row"><div class="k">Spend</div><div class="v big">$274.21</div></div>
+        <div class="ad-row"><div class="k">外部收入</div><div class="v">$13.99</div></div>
+        <div class="ad-row"><div class="k">Impressions</div><div class="v">50,079</div></div>
+        <div class="ad-row"><div class="k">外部付费</div><div class="v">2 笔</div></div>
+        <div class="ad-row"><div class="k">Clicks</div><div class="v big">8,245</div></div>
+        <div class="ad-row"><div class="k">Reach</div><div class="v">42,741</div></div>
+        <div class="ad-row"><div class="k">CTR</div><div class="v warn">16.46% ⚠</div></div>
+        <div class="ad-row"><div class="k">Frequency</div><div class="v">1.17</div></div>
+        <div class="ad-row"><div class="k">CPC</div><div class="v warn">$0.033 ⚠</div></div>
+        <div class="ad-row"><div class="k">ACTIVE 校园</div><div class="v" style="color:var(--text-mute)">0（已暂停）</div></div>
+      </div>
+      <div class="alert-box">
+        <div class="ttl">流量质量警示</div>
+        <div class="body">CTR 16% 异常高 + CPC $0.033 异常低 = <b style="color:var(--amber)">点击农场签名</b>。drama 自家 <code style="color:var(--text-pri)">docs/runbook/conversion-funnel-analysis.md §6</code> 明文规则：<i>"低于 $0.01 + 4K+ 点击几乎必假"</i>。</div>
+        <div class="src">→ 跑 cf_firewall_threats 看 PH/NG 的 bot 比例做交叉验证</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="label">MOD · 04 — 真实流量地理分布</div>
+      <div class="meta">source: Cloudflare Stream — minutesViewed by country</div>
+    </div>
+    <div class="card-body">
+      <div class="country-grid">
+        <div class="country-list">
+          <div class="crow"><div class="name">🇵🇭 PH</div><div class="bar-wrap"><div class="bar" style="width:100%"></div></div><div class="min">785 min</div><div class="pct">11.5%</div></div>
+          <div class="crow"><div class="name">🇳🇬 NG</div><div class="bar-wrap"><div class="bar" style="width:89%"></div></div><div class="min">700 min</div><div class="pct">10.2%</div></div>
+          <div class="crow"><div class="name">🇺🇸 US</div><div class="bar-wrap"><div class="bar" style="width:55%"></div></div><div class="min">429 min</div><div class="pct">6.3%</div></div>
+          <div class="crow"><div class="name">🇨🇩 CD</div><div class="bar-wrap"><div class="bar" style="width:53%"></div></div><div class="min">419 min</div><div class="pct">6.1%</div></div>
+          <div class="crow"><div class="name">🇮🇩 ID</div><div class="bar-wrap"><div class="bar" style="width:50%"></div></div><div class="min">390 min</div><div class="pct">5.7%</div></div>
+        </div>
+        <div class="compare-box">
+          <div class="row"><span class="k">DB top 5</span><span class="v">SG · US · GB · ZA · FR</span></div>
+          <div class="row"><span class="k">CF top 5</span><span class="v" style="color:var(--accent)">PH · NG · US · CD · ID</span></div>
+          <div class="gap-note">两边 <b>完全不重合</b>（data-gaps §2）。<br/>按 DB geo 做投放优化建立在 <b style="color:var(--amber)">错样本</b> —— 新兴市场真实流量被起播失败静默吃掉。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="label">MOD · 05 — drama BI 已知陷阱清单</div>
+      <div class="meta">source: docs/design/observability/data-gaps.md</div>
+    </div>
+    <div class="card-body">
+      <div class="gaps">
+        <div class="gap-card crit"><div class="id">#1</div><div class="ttl">Beacon coverage gap ~60%</div><div class="desc">Next.js hydration 慢，用户在 episode-runtime mount 前关页 → session 行不存在。所有 session-based 指标 undercount。</div></div>
+        <div class="gap-card crit"><div class="id">#2</div><div class="ttl">DB geo ≠ CF Stream geo</div><div class="desc">Vercel Edge x-vercel-ip-country 只有起播成功才记。新兴市场弱网失败用户在 BI 看不见。</div></div>
+        <div class="gap-card warn"><div class="id">#3</div><div class="ttl">Stripe 内部测试单占 31%</div><div class="desc">必须 filter <code>@sandwichlab.ai</code> + <code>clientId LIKE 'test_%'</code> + 纯数字 uid。不剔除转化率被严重压低。</div></div>
+        <div class="gap-card warn"><div class="id">#4</div><div class="ttl">Stripe customer_details 全空</div><div class="desc">expired session 里 name/address/phone 全 null = <b>用户根本没到填卡页</b>。Stripe 跳转被 in-app browser 拦截。</div></div>
+        <div class="gap-card info" style="grid-column:1 / -1"><div class="id">#5</div><div class="ttl">Subscribe → Purchase 事件命名漂移</div><div class="desc">Meta 算法识别 event_name 时只认 <code>Purchase</code>。早期 webhook 发的是 <code>Subscribe</code>，被 Pixel 算法忽略 → 优化目标失效。</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <div class="label">MOD · 06 — 下周必须做的事</div>
+      <div class="meta">source: Claude Opus 4.7 reflection · 2026-05-19</div>
+    </div>
+    <div class="card-body">
+      <div class="actions">
+        <div class="action"><span class="sev HIGH">HIGH</span><span class="mod-tag">product</span><span class="action-text">把 play_sessions beacon 触发挪到 player <code>load()</code>，不等 TTFF。修复 60.8% beacon gap。预期影响：所有 session-based 指标可信化。</span></div>
+        <div class="action"><span class="sev HIGH">HIGH</span><span class="mod-tag">product</span><span class="action-text">排查 PaywallView → Stripe 跳转链路：iOS Safari 拦截？微信 in-app browser？LockedOverlay 在 desktop 缺失？修复 98% paywall flush。</span></div>
+        <div class="action"><span class="sev HIGH">HIGH</span><span class="mod-tag">analytics</span><span class="action-text">信号量 &lt; 30 时分析工具返回 <code>insufficient_signal</code>。避免基于 2 单 paid 做"按国家""按 tag"结论（本期外部 paid uid = 2）。</span></div>
+        <div class="action"><span class="sev MED">MED</span><span class="mod-tag">content</span><span class="action-text">Top series 占 95.7% sessions（单剧 <i>Accidentally Slept with the Young Mafia Boss</i>）= 投放素材集中。加单剧 dominance 警报：&gt;80% 单剧 → 标红。</span></div>
+        <div class="action"><span class="sev MED">MED</span><span class="mod-tag">channels</span><span class="action-text">DB / CF geo 不重合是 CDN 性能问题不是用户质量。跑按国家 stall ratio + TTFF 定位 PH / NG / CD 边缘节点是否慢。</span></div>
+        <div class="action"><span class="sev LOW">LOW</span><span class="mod-tag">reports</span><span class="action-text">funnel 表 kind=proxy 节点用斜体 + 脚注标注，与 real 节点视觉区分；避免阅读者混读 PageView/ViewContent/PaywallView 与真实计数。</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sources">
+    <div class="src-row">
+      <span class="src">Supabase PG (26 表)</span>
+      <span class="src">Stripe REST</span>
+      <span class="src">Cloudflare Stream</span>
+      <span class="src">Cloudflare Firewall</span>
+      <span class="src">Meta Marketing API ×2</span>
+      <span class="src">GitHub local clone</span>
+    </div>
+    <span class="sign">drama-pipeline-mcp v1.1</span>
+  </div>
+
+  <div class="foot">
+    生成时间 2026-05-20 · 数据 100% 实测拉取 · 无人工填充 · 周期 2026-05-13 → 2026-05-19 (W20)
+  </div>
+
 </div>
-
-<h2>MOD-02 · Full Funnel · 7 Nodes</h2>
-<table>
-  <thead><tr><th>Stage</th><th>Count</th><th>Drop</th></tr></thead>
-  <tbody>
-    <tr><td>① PageView <em>(proxy)</em></td><td class="bold">1,516</td><td>—</td></tr>
-    <tr><td>② ViewContent <em>(proxy)</em></td><td class="bold">1,516</td><td>0.0%</td></tr>
-    <tr><td>③ PlayStart</td><td class="bold">930</td><td>−38.7%</td></tr>
-    <tr><td>④ WatchProgress</td><td class="bold">317</td><td>−65.9%</td></tr>
-    <tr><td>⑤ PaywallView <em>(proxy)</em></td><td class="bold">296</td><td>−6.6%</td></tr>
-    <tr><td>⑥ InitiateCheckout</td><td class="bold red">6</td><td class="red">−98.0%</td></tr>
-    <tr><td>⑦ Purchase</td><td class="bold">2</td><td>−66.7%</td></tr>
-  </tbody>
-</table>
-<div class="callout">主要漏洞：⑤→⑥ 流失 98%。296 人看到付费墙，只有 6 人点击 Stripe。</div>
-
-<h2>MOD-03 · Meta Ad Data · W20</h2>
-<table>
-  <thead><tr><th>Metric</th><th>Value</th><th>Metric</th><th>Value</th></tr></thead>
-  <tbody>
-    <tr><td>Spend</td><td class="bold accent">$274.21</td><td>CTR</td><td class="bold amber">16.46% ⚠</td></tr>
-    <tr><td>外部收入</td><td class="bold">$13.99</td><td>Reach</td><td class="bold">42,741</td></tr>
-    <tr><td>Impressions</td><td class="bold">50,079</td><td>Frequency</td><td class="bold">1.17</td></tr>
-    <tr><td>Clicks</td><td class="bold accent">8,245</td><td>CPC</td><td class="bold amber">$0.033 ⚠</td></tr>
-  </tbody>
-</table>
-
-<h2>MOD-04 · Country Distribution · CF Stream</h2>
-<table>
-  <thead><tr><th>Country</th><th>Watch Time</th><th>Share</th></tr></thead>
-  <tbody>
-    <tr><td>🇵🇭 PH</td><td>785 min</td><td class="bold">11.5%</td></tr>
-    <tr><td>🇳🇬 NG</td><td>700 min</td><td class="bold">10.2%</td></tr>
-    <tr><td>🇺🇸 US</td><td>429 min</td><td class="bold">6.3%</td></tr>
-    <tr><td>🇨🇩 CD</td><td>419 min</td><td class="bold">6.1%</td></tr>
-    <tr><td>🇮🇩 ID</td><td>390 min</td><td class="bold">5.7%</td></tr>
-  </tbody>
-</table>
-
-<h2>MOD-05 · Known Data Gaps</h2>
-<table>
-  <thead><tr><th>Severity</th><th>Issue</th></tr></thead>
-  <tbody>
-    <tr><td class="red">CRIT</td><td>Beacon coverage gap ~60% — CF Stream 6,847 min vs DB 2,682 min</td></tr>
-    <tr><td class="red">CRIT</td><td>DB geo ≠ CF Stream geo — 新兴市场弱网失败用户不可见</td></tr>
-    <tr><td class="amber">WARN</td><td>Stripe 内部测试单占 31% — 真实付费仅 2 笔</td></tr>
-    <tr><td class="amber">WARN</td><td>Stripe customer_details 全空 — 用户未到填卡页</td></tr>
-    <tr><td style="color:#3B82F6">INFO</td><td>Subscribe→Purchase 命名漂移 — 事件未对齐，ROAS 分母错误</td></tr>
-  </tbody>
-</table>
-
-<h2>MOD-06 · Next Week Actions · W21</h2>
-<div class="action-row"><span class="badge-high">HIGH</span><span class="owner">product</span><span>beacon 触发挪到 player load()，修复 60.8% beacon gap</span></div>
-<div class="action-row"><span class="badge-high">HIGH</span><span class="owner">product</span><span>排查 PaywallView→Stripe 跳转链路，修复 98% paywall flush</span></div>
-<div class="action-row"><span class="badge-high">HIGH</span><span class="owner">analytics</span><span>信号量 &lt; 30 时返回 insufficient_signal</span></div>
-<div class="action-row"><span class="badge-med">MED</span><span class="owner">content</span><span>Top series 占 95.7% sessions，加单剧 dominance 警报</span></div>
-<div class="action-row"><span class="badge-med">MED</span><span class="owner">channels</span><span>DB/CF geo 不重合定位 PH/NG/CD 边缘节点 stall ratio + TTFF</span></div>
-
-<h2>MOD-07 · Sources</h2>
-<div class="sources">
-  <span class="src"><span class="dot"></span>Supabase PG (26 表)</span>
-  <span class="src"><span class="dot"></span>Stripe REST</span>
-  <span class="src"><span class="dot"></span>Cloudflare Stream</span>
-  <span class="src"><span class="dot"></span>Cloudflare Firewall</span>
-  <span class="src"><span class="dot"></span>Meta Marketing API ×2</span>
-  <span class="src"><span class="dot"></span>GitHub local clone</span>
-</div>
-
-<footer>
-  生成时间 2026-05-20 · 数据 100% 实测拉取 · 无人工填充 · 周期 2026-05-13 → 2026-05-19 (W20) · drama-pipeline-mcp v1.1<br/>
-  Generated by Lanbow Reporting Engine
-</footer>
 </body>
 </html>`;
 }
