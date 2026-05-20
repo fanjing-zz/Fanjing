@@ -18,7 +18,7 @@ const Badge = ({ text, variant = 'muted', dot }: {
   text: string; variant?: 'muted' | 'active' | 'danger' | 'live' | 'blue' | 'warn'; dot?: boolean;
 }) => {
   const s = {
-    muted:  { bg: 'rgba(255,255,255,0.04)', color: c.textSec,  border: c.border },
+    muted:  { bg: c.bgCard,                  color: c.textSec,  border: c.border },
     active: { bg: 'rgba(0,177,162,0.07)',   color: c.accent,   border: 'rgba(0,177,162,0.2)' },
     danger: { bg: 'rgba(255,45,120,0.12)',  color: '#FF2D78',  border: 'rgba(255,45,120,0.3)' },
     live:   { bg: 'rgba(0,204,119,0.12)',   color: '#00CC77',  border: 'rgba(0,204,119,0.3)' },
@@ -55,7 +55,7 @@ function MsgActions({ visible, actions }: {
       {actions.map(({ icon, label }) => (
         <button key={label} title={label} style={{
           fontFamily: c.mono, fontSize: 8, padding: '3px 9px',
-          background: 'rgba(255,255,255,0.04)',
+          background: c.bgCard,
           border: `1px solid ${c.border}`,
           borderRadius: 4, color: c.textSec, cursor: 'pointer',
           display: 'inline-flex', alignItems: 'center', gap: 4,
@@ -249,9 +249,7 @@ function AnimatedLaunch() {
         background: c.accent, border: 'none', borderRadius: 6,
         color: c.bgBase, cursor: 'pointer',
         textTransform: 'uppercase', letterSpacing: '0.08em',
-        boxShadow: hov
-          ? `0 0 32px rgba(0,177,162,0.5), 0 4px 20px rgba(0,177,162,0.35)`
-          : `0 0 20px ${c.accentGlow}`,
+        boxShadow: 'none',
         transform: hov ? 'translateY(-1px)' : 'translateY(0)',
         transition: 'all 0.16s',
         position: 'relative', overflow: 'hidden',
@@ -314,7 +312,7 @@ function RoasGauge() {
     const done = i / 80 <= pct;
     ticks.push(
       <line key={i} x1={p1.x.toFixed(1)} y1={p1.y.toFixed(1)} x2={p2.x.toFixed(1)} y2={p2.y.toFixed(1)}
-        stroke={done ? 'rgba(255,255,255,0.78)' : 'rgba(255,255,255,0.17)'}
+        stroke={done ? c.accent : c.border}
         strokeWidth={isMajor ? 1.4 : 0.7} />
     );
   }
@@ -326,7 +324,6 @@ function RoasGauge() {
     { val: '20', deg: startDeg + totalDeg },
   ];
 
-  const glowSize = 4 + (pct * 8);
   const displayVal = liveVal.toFixed(1) + 'x';
 
   return (
@@ -340,7 +337,6 @@ function RoasGauge() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
           <div style={{
             width: 5, height: 5, borderRadius: '50%', background: c.accent,
-            boxShadow: `0 0 6px ${c.accent}`,
             animation: 'roasPulse 1.4s ease-in-out infinite',
           }} />
           <M upper size={9} color={c.accent}>Live</M>
@@ -353,20 +349,15 @@ function RoasGauge() {
             <stop offset="55%"  stopColor="#006E66" stopOpacity={1} />
             <stop offset="100%" stopColor={c.accent}  stopOpacity={1} />
           </linearGradient>
-          <filter id="rGlow" x="-30%" y="-30%" width="160%" height="160%">
-            <feGaussianBlur stdDeviation={glowSize} result="b" />
-            <feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge>
-          </filter>
         </defs>
         <path d={arcPath(startDeg, totalDeg, R, rInner)} fill={c.bgBase} opacity={0.7} />
-        <path d={arcPath(startDeg, totalDeg, R, rInner)} fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="0.5" />
-        <path d={arcPath(startDeg, totalDeg * pct, R, rInner)} fill="url(#rGrad)" filter="url(#rGlow)" />
+        <path d={arcPath(startDeg, totalDeg, R, rInner)} fill="none" stroke={c.border} strokeWidth="0.5" />
+        <path d={arcPath(startDeg, totalDeg * pct, R, rInner)} fill="url(#rGrad)" />
         {(() => {
           const tipDeg = startDeg + totalDeg * pct;
           const tipR = (R + rInner) / 2;
           const tip = polar(tipDeg, tipR);
-          return <circle cx={tip.x.toFixed(1)} cy={tip.y.toFixed(1)} r="4" fill={c.accent}
-            style={{ filter: `drop-shadow(0 0 ${glowSize}px ${c.accent})` }} />;
+          return <circle cx={tip.x.toFixed(1)} cy={tip.y.toFixed(1)} r="4" fill={c.accent} />;
         })()}
         {ticks}
         {scaleLabels.map(({ val, deg }) => {
@@ -376,8 +367,7 @@ function RoasGauge() {
             fill={c.textSec} fontFamily={c.mono} fontSize={9}>{val}</text>;
         })}
         <text x={cx} y={cy - 14} textAnchor="middle" fill={c.accent}
-          fontFamily={c.sans} fontWeight={400} fontSize={24}
-          style={{ filter: `drop-shadow(0 0 ${glowSize + 6}px ${c.accent})` }}>
+          fontFamily={c.sans} fontWeight={400} fontSize={24}>
           {displayVal}
         </text>
         <text x={cx} y={cy + 12} textAnchor="middle" fill={c.textSec} fontFamily={c.mono} fontSize={10}>ROAS</text>
@@ -500,7 +490,7 @@ function WaveformCard() {
           {/* Grid */}
           {yTicks.map(v=>(
             <line key={v} x1={PL} y1={yR(v).toFixed(1)} x2={W-PR} y2={yR(v).toFixed(1)}
-              stroke="rgba(255,255,255,0.045)" strokeWidth={0.7} strokeDasharray={v===0?'none':'3,3'} />
+              stroke={c.border} strokeWidth={0.7} strokeDasharray={v===0?'none':'3,3'} />
           ))}
           {yTicks.filter(v=>v>0).map(v=>(
             <text key={v} x={PL-3} y={yR(v)+3} textAnchor="end" fontFamily={c.mono} fontSize={7} fill={c.textMute}>{v}×</text>
@@ -508,8 +498,7 @@ function WaveformCard() {
           {/* Area + lines */}
           <path d={area} fill="url(#wcGrad)" />
           <polyline points={ctrPts} fill="none" stroke="#3B82F6" strokeWidth={1.2} strokeLinejoin="round" opacity={0.6} strokeDasharray="4,2" />
-          <polyline points={roasPts} fill="none" stroke={c.accent} strokeWidth={1.8} strokeLinejoin="round" opacity={0.92}
-            style={{ filter:`drop-shadow(0 0 3px rgba(0,177,162,0.5))` }} />
+          <polyline points={roasPts} fill="none" stroke={c.accent} strokeWidth={1.8} strokeLinejoin="round" opacity={0.92} />
           {/* Key dots */}
           {[9,17,21].map(h=>(
             <circle key={h} cx={xOf(h)} cy={yR(roas[h])} r={2.5} fill={c.bgCard} stroke={c.accent} strokeWidth={1.5} />
@@ -523,7 +512,7 @@ function WaveformCard() {
             </g>
           ))}
           {/* Now */}
-          <line x1={xOf(nowH)} y1={PT} x2={xOf(nowH)} y2={PT+CH} stroke="rgba(255,255,255,0.12)" strokeWidth={1} />
+          <line x1={xOf(nowH)} y1={PT} x2={xOf(nowH)} y2={PT+CH} stroke={c.border} strokeWidth={1} strokeDasharray="3,2" />
           {/* X labels */}
           {xLabels.map(({h,t})=>(
             <text key={h} x={xOf(h)} y={PT+CH+13} textAnchor="middle" fontFamily={c.mono} fontSize={7}
@@ -784,13 +773,13 @@ function ScaleTopAdSetsReply() {
         {rows.map(row => (
           <div key={row.id} style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 6 }}>
             <M size={9} color={c.textMute} style={{ width: 56, flexShrink: 0 }}>{row.id}</M>
-            <div style={{ flex: 1, height: 12, background: 'rgba(255,255,255,0.04)', borderRadius: 3, position: 'relative', overflow: 'hidden' }}>
+            <div style={{ flex: 1, height: 12, background: 'var(--c-border)', borderRadius: 3, position: 'relative', overflow: 'hidden' }}>
               <div style={{
                 position: 'absolute', left: 0, top: 0, bottom: 0, borderRadius: 3,
                 width: `${(row.roas / 20) * 100}%`,
                 background: `linear-gradient(90deg, ${c.accent}, rgba(0,177,162,0.55))`,
               }} />
-              <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 1, background: 'rgba(255,255,255,0.12)' }} />
+              <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: 1, background: c.border }} />
             </div>
             <M size={9} color={c.accent} style={{ width: 34, textAlign: 'right', flexShrink: 0 }}>{row.roas}×</M>
             <M size={9} color='#00CC77' style={{ width: 42, textAlign: 'right', flexShrink: 0 }}>${row.rec}</M>
@@ -838,7 +827,7 @@ function PauseUnderperformingReply() {
           }}>
             <M size={9} color={c.textMute}>{row.id}</M>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <div style={{ flex: 1, height: 6, background: 'rgba(255,255,255,0.04)', borderRadius: 3, overflow: 'hidden' }}>
+              <div style={{ flex: 1, height: 6, background: 'var(--c-border)', borderRadius: 3, overflow: 'hidden' }}>
                 <div style={{ height: '100%', borderRadius: 3, width: `${(row.roas / THRESHOLD) * 100}%`, background: row.roas < 5 ? '#FF2D78' : '#FFB800' }} />
               </div>
               <M size={9} color={row.roas < 5 ? '#FF2D78' : '#FFB800'} style={{ width: 26, textAlign: 'right', flexShrink: 0 }}>{row.roas}×</M>
@@ -971,7 +960,7 @@ function ExportReportReply() {
           {funnel.map(row => (
             <div key={row.step} style={{ display: 'grid', gridTemplateColumns: '120px 1fr 52px', alignItems: 'center', gap: 10 }}>
               <M size={9} color={row.crit ? '#FF4466' : c.textSec}>{row.step} {row.label}</M>
-              <div style={{ height: 14, background: 'rgba(255,255,255,0.04)', borderRadius: 3, overflow: 'hidden' }}>
+              <div style={{ height: 14, background: 'var(--c-border)', borderRadius: 3, overflow: 'hidden' }}>
                 <div style={{
                   height: '100%', width: `${Math.max(row.pct, 0.5)}%`,
                   background: row.crit
@@ -1109,7 +1098,55 @@ function DownloadReportRow() {
   );
 }
 
-function buildReportHTML(): string {
+function buildReportHTML(theme: 'dark' | 'light' = 'dark'): string {
+  const dk = theme === 'dark';
+  const vars = dk ? {
+    bgBase:       '#071015',
+    bgPanel:      '#0B1720',
+    bgCard:       '#0E1D28',
+    bgInput:      '#091318',
+    accent:       '#00B1A2',
+    accentMid:    '#008E82',
+    accentDim:    'rgba(0,177,162,0.12)',
+    accentGlow:   'rgba(0,177,162,0.30)',
+    green:        '#00CC77',
+    amber:        '#FFB800',
+    danger:       '#FF4466',
+    info:         '#3B82F6',
+    textPri:      '#BDD8E8',
+    textSec:      '#7AAFC0',
+    textMute:     '#3D6575',
+    textLabel:    '#4A7A8A',
+    border:       'rgba(0,177,162,0.08)',
+    borderStrong: 'rgba(0,177,162,0.18)',
+    bgSurface:    'rgba(0,0,0,0.18)',
+    cardHeadBg:   'rgba(0,177,162,0.02)',
+    gridColor:    'rgba(0,177,162,0.035)',
+    titleGradTop: '#E8F4F0',
+  } : {
+    bgBase:       '#F6F9FA',
+    bgPanel:      '#EDF2F4',
+    bgCard:       '#FFFFFF',
+    bgInput:      '#F0F5F7',
+    accent:       '#007E79',
+    accentMid:    '#006A66',
+    accentDim:    'rgba(0,126,121,0.10)',
+    accentGlow:   'rgba(0,126,121,0.18)',
+    green:        '#008F58',
+    amber:        '#C47A00',
+    danger:       '#D42040',
+    info:         '#2563EB',
+    textPri:      '#1A2E38',
+    textSec:      '#4A6B7A',
+    textMute:     '#7A9BAB',
+    textLabel:    '#5A7A8A',
+    border:       'rgba(0,0,0,0.08)',
+    borderStrong: 'rgba(0,0,0,0.14)',
+    bgSurface:    'rgba(0,0,0,0.03)',
+    cardHeadBg:   'rgba(0,126,121,0.04)',
+    gridColor:    'rgba(0,126,121,0.055)',
+    titleGradTop: '#0F1E28',
+  };
   return `<!doctype html>
 <html lang="zh">
 <head>
@@ -1121,24 +1158,26 @@ function buildReportHTML(): string {
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg-base:    #071015;
-    --bg-panel:   #0B1720;
-    --bg-card:    #0E1D28;
-    --bg-input:   #091318;
-    --accent:     #00B1A2;
-    --accent-mid: #008E82;
-    --accent-dim: rgba(0,177,162,0.12);
-    --accent-glow:rgba(0,177,162,0.30);
-    --green:  #00CC77;
-    --amber:  #FFB800;
-    --danger: #FF4466;
-    --info:   #3B82F6;
-    --text-pri:  #BDD8E8;
-    --text-sec:  #7AAFC0;
-    --text-mute: #3D6575;
-    --text-label:#4A7A8A;
-    --border:        rgba(0,177,162,0.08);
-    --border-strong: rgba(0,177,162,0.18);
+    --bg-base:    ${vars.bgBase};
+    --bg-panel:   ${vars.bgPanel};
+    --bg-card:    ${vars.bgCard};
+    --bg-input:   ${vars.bgInput};
+    --accent:     ${vars.accent};
+    --accent-mid: ${vars.accentMid};
+    --accent-dim: ${vars.accentDim};
+    --accent-glow:${vars.accentGlow};
+    --green:  ${vars.green};
+    --amber:  ${vars.amber};
+    --danger: ${vars.danger};
+    --info:   ${vars.info};
+    --text-pri:   ${vars.textPri};
+    --text-sec:   ${vars.textSec};
+    --text-mute:  ${vars.textMute};
+    --text-label: ${vars.textLabel};
+    --border:        ${vars.border};
+    --border-strong: ${vars.borderStrong};
+    --bg-surface:    ${vars.bgSurface};
+    --card-head-bg:  ${vars.cardHeadBg};
     --mono: 'Liberation Mono', 'Space Mono', 'Courier New', monospace;
     --sans: 'Inter', system-ui, sans-serif;
   }
@@ -1146,8 +1185,8 @@ function buildReportHTML(): string {
   html,body{margin:0;padding:0;background:var(--bg-base);color:var(--text-pri);font-family:var(--sans);font-size:13px;line-height:1.55}
   body{
     background-image:
-      linear-gradient(rgba(0,177,162,0.035) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,177,162,0.035) 1px, transparent 1px);
+      linear-gradient(${vars.gridColor} 1px, transparent 1px),
+      linear-gradient(90deg, ${vars.gridColor} 1px, transparent 1px);
     background-size: 32px 32px;
     background-position: center top;
   }
@@ -1202,7 +1241,7 @@ function buildReportHTML(): string {
   .country-grid{ display: grid; grid-template-columns: 1.4fr 1fr; gap: 22px }
   .country-list .crow{ display:grid; grid-template-columns: 50px 1fr 70px 60px; gap:10px; align-items:center; padding:7px 0 }
   .country-list .name{ font-family: var(--mono); font-size: 11px; color: var(--text-pri) }
-  .country-list .bar-wrap{ height: 8px; background: rgba(255,255,255,0.04); border-radius: 4px; overflow: hidden }
+  .country-list .bar-wrap{ height: 8px; background: var(--c-border); border-radius: 4px; overflow: hidden }
   .country-list .bar{ height: 100%; background: var(--accent); opacity: 0.75; border-radius: 4px; box-shadow: 0 0 6px var(--accent-glow) }
   .country-list .min{ font-family: var(--mono); font-size: 10px; color: var(--text-sec); text-align: right }
   .country-list .pct{ font-family: var(--mono); font-size: 11px; color: var(--accent); text-align: right; font-weight: 700 }
@@ -1480,7 +1519,7 @@ function PixelEventsReply() {
                 <M size={10} color={row.color} bold>{row.count.toLocaleString()}</M>
               </div>
             </div>
-            <div style={{ height: 6, background: 'rgba(255,255,255,0.04)', borderRadius: 3, overflow: 'hidden' }}>
+            <div style={{ height: 6, background: 'var(--c-border)', borderRadius: 3, overflow: 'hidden' }}>
               <div style={{ height: '100%', borderRadius: 3, width: `${(row.count / maxCount) * 100}%`, background: row.color, opacity: 0.8 }} />
             </div>
           </div>
@@ -1535,16 +1574,16 @@ function QuickSuggestions({ onSelect, usedChips }: { onSelect: (text: string) =>
               fontFamily: c.mono, fontSize: 9,
               padding: '5px 11px',
               background: used
-                ? 'rgba(255,255,255,0.02)'
-                : hov === i ? 'rgba(0,177,162,0.10)' : 'rgba(0,177,162,0.03)',
-              border: `1px solid ${used ? 'rgba(255,255,255,0.05)' : hov === i ? 'rgba(0,177,162,0.38)' : 'rgba(0,177,162,0.12)'}`,
+                ? c.bgCard
+                : hov === i ? c.accentDim : 'transparent',
+              border: `1px solid ${used ? c.border : hov === i ? c.borderStrong : c.border}`,
               borderRadius: 20,
               color: used ? c.textMute : hov === i ? c.accent : c.textSec,
               cursor: used ? 'default' : 'pointer',
               display: 'inline-flex', alignItems: 'center', gap: 5,
               transition: 'all 0.15s',
               transform: !used && hov === i ? 'translateY(-1px)' : 'translateY(0)',
-              boxShadow: !used && hov === i ? `0 0 12px rgba(0,177,162,0.14)` : 'none',
+              boxShadow: 'none',
               letterSpacing: '0.06em', textTransform: 'uppercase',
               animation: `chatChipIn 0.3s ease both`,
               animationDelay: `${i * 45}ms`,
@@ -1578,10 +1617,10 @@ function AnimatedInputBar({ value, onChange, onFocus, onBlur, focused, onSend }:
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: 8,
-      background: focused ? 'rgba(0,177,162,0.025)' : 'rgba(255,255,255,0.02)',
+      background: c.bgInput,
       border: `1px solid ${focused ? 'rgba(0,177,162,0.45)' : c.border}`,
       borderRadius: 10, padding: '9px 10px 9px 14px',
-      boxShadow: focused ? `0 0 0 3px rgba(0,177,162,0.07), 0 0 28px rgba(0,177,162,0.04)` : 'none',
+      boxShadow: focused ? `0 0 0 2px ${c.accentDim}` : 'none',
       transition: 'all 0.2s',
       position: 'relative', overflow: 'hidden',
     }}>
@@ -1626,7 +1665,7 @@ function AnimatedInputBar({ value, onChange, onFocus, onBlur, focused, onSend }:
         <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, marginRight: 4 }}>
           <kbd style={{
             fontFamily: c.mono, fontSize: 8, padding: '2px 5px',
-            background: 'rgba(255,255,255,0.04)', border: `1px solid ${c.border}`,
+            background: 'var(--c-border)', border: `1px solid ${c.border}`,
             borderRadius: 3, color: c.textMute, letterSpacing: '0.06em',
           }}>/</kbd>
           <M size={8} color={c.textMute}>commands</M>
