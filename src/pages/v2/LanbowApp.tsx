@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { c } from './theme2';
+import { c, applyTheme } from './theme2';
 import { CommChatContent }   from './CommChatContent';
 import { CommDetailContent } from './CommDetailContent';
 import { CampaignsContent }  from './CampaignsContent';
@@ -127,7 +127,11 @@ function Sidebar({ page, onNav }: { page: PageId; onNav: (p: PageId) => void }) 
 // ─── TopBar ───────────────────────────────────────────────────────────────────
 type UserTab = 'profile' | 'workspace' | 'billing';
 
-function TopBar({ onOpenUserCenter }: { onOpenUserCenter: (tab: UserTab) => void }) {
+function TopBar({ onOpenUserCenter, isDark, onToggleDark }: {
+  onOpenUserCenter: (tab: UserTab) => void;
+  isDark: boolean;
+  onToggleDark: () => void;
+}) {
   const [dropOpen, setDropOpen] = React.useState(false);
   const dropRef = React.useRef<HTMLDivElement>(null);
 
@@ -159,6 +163,34 @@ function TopBar({ onOpenUserCenter }: { onOpenUserCenter: (tab: UserTab) => void
       </span>
       <div style={{ flex: 1 }} />
 
+      {/* Theme toggle */}
+      <button
+        onClick={onToggleDark}
+        title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+        style={{
+          width: 32, height: 32, borderRadius: 8, border: `1px solid ${c.border}`,
+          background: 'transparent', cursor: 'pointer', marginRight: 10,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: c.textSec, transition: 'border-color 0.15s, color 0.15s',
+        }}
+        onMouseEnter={e => { e.currentTarget.style.borderColor = c.borderStrong; e.currentTarget.style.color = c.textPri; }}
+        onMouseLeave={e => { e.currentTarget.style.borderColor = c.border; e.currentTarget.style.color = c.textSec; }}
+      >
+        {isDark ? (
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        ) : (
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        )}
+      </button>
+
       {/* Avatar + dropdown */}
       <div ref={dropRef} style={{ position: 'relative' }}>
         <button
@@ -178,9 +210,9 @@ function TopBar({ onOpenUserCenter }: { onOpenUserCenter: (tab: UserTab) => void
         {dropOpen && (
           <div style={{
             position: 'absolute', top: 44, right: 0, zIndex: 200,
-            background: '#0d1e2a', border: `1px solid ${c.borderStrong}`,
+            background: c.bgElevated, border: `1px solid ${c.borderStrong}`,
             borderRadius: 10, width: 200,
-            boxShadow: '0 16px 48px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,177,162,0.08)',
+            boxShadow: `0 16px 48px ${c.shadowColor}, 0 0 0 1px ${c.border}`,
             overflow: 'hidden',
           }}>
             {/* User info header */}
@@ -293,7 +325,7 @@ function UserCenterDrawer({ tab, onClose, onTabChange }: {
         onClick={onClose}
         style={{
           position: 'fixed', inset: 0, zIndex: 300,
-          background: 'rgba(4,10,14,0.55)',
+          background: c.overlayBg,
           backdropFilter: 'blur(2px)',
           opacity: open ? 1 : 0,
           pointerEvents: open ? 'auto' : 'none',
@@ -304,9 +336,9 @@ function UserCenterDrawer({ tab, onClose, onTabChange }: {
       <div style={{
         position: 'fixed', top: 0, right: 0, bottom: 0, zIndex: 310,
         width: 520,
-        background: '#0a1820',
+        background: c.bgPanel,
         borderLeft: `1px solid ${c.borderStrong}`,
-        boxShadow: '-24px 0 80px rgba(0,0,0,0.7)',
+        boxShadow: `-24px 0 80px ${c.shadowColor}`,
         display: 'flex', flexDirection: 'column',
         transform: open ? 'translateX(0)' : 'translateX(100%)',
         transition: 'transform 0.3s cubic-bezier(0.32,0,0.15,1)',
@@ -568,7 +600,7 @@ function WorkspaceTab() {
               {m.online && (
                 <div style={{
                   position: 'absolute', bottom: 1, right: 1, width: 7, height: 7,
-                  borderRadius: '50%', background: '#00CC77', border: `1.5px solid #0a1820`,
+                  borderRadius: '50%', background: '#00CC77', border: `1.5px solid ${c.bgPanel}`,
                 }} />
               )}
             </div>
@@ -1067,13 +1099,13 @@ function FloatingChat({
   return (
     <div style={{
       position: 'absolute', bottom: 20, left: 24, right: 24, zIndex: 50,
-      background: focused ? 'rgba(7,16,12,0.97)' : 'rgba(7,16,12,0.91)',
+      background: c.bgFloat,
       backdropFilter: 'blur(20px)',
       border: `1px solid ${focused || hasMod ? c.borderStrong : c.border}`,
       borderRadius: 12, overflow: 'hidden',
       boxShadow: focused || hasMod
-        ? `0 12px 48px rgba(0,0,0,0.75), 0 0 0 1px rgba(0,177,162,0.14), 0 0 28px rgba(0,177,162,0.07)`
-        : `0 8px 32px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,177,162,0.05)`,
+        ? `0 12px 48px ${c.shadowColor}, 0 0 0 1px ${c.borderStrong}`
+        : `0 8px 32px ${c.shadowColor}, 0 0 0 1px ${c.border}`,
       transition: 'box-shadow 0.2s, border-color 0.2s, background 0.2s',
     }}>
 
@@ -1167,9 +1199,12 @@ function FloatingChat({
 
 // ─── Root App ─────────────────────────────────────────────────────────────────
 export function LanbowApp() {
+  const [isDark, setIsDark] = useState(true);
   const [showLanding, setShowLanding] = useState(true);
   const [showTour,    setShowTour]    = useState(false);
   const [page, setPage] = useState<PageId>('chat');
+
+  React.useEffect(() => { applyTheme(isDark); }, [isDark]);
   const [chatMsgs, setChatMsgs] = useState<ChatMsg[]>([]);
   const [typing, setTyping] = useState(false);
   const [selectedModule, setSelectedModule] = useState<SelMod | null>(null);
@@ -1214,7 +1249,7 @@ export function LanbowApp() {
 
       {/* Onboarding tour overlay */}
       <OnboardingTour isActive={showTour} onComplete={() => setShowTour(false)} />
-      <TopBar onOpenUserCenter={setUserCenterTab} />
+      <TopBar onOpenUserCenter={setUserCenterTab} isDark={isDark} onToggleDark={() => setIsDark(d => !d)} />
       <UserCenterDrawer
         tab={userCenterTab}
         onClose={() => setUserCenterTab(null)}
