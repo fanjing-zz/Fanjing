@@ -1,7 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { c } from './theme2';
 import { ChatMsg } from './agentLogic';
-import { ReportsContent } from './ReportsContent';
 
 // ── Primitives ────────────────────────────────────────────────────────────────
 const M = ({ children, size = 11, color = c.textSec, upper = false, bold = false, style }: {
@@ -1061,6 +1060,126 @@ function PixelEventsReply() {
   );
 }
 
+// ── drama W20 投放复盘 reply ──────────────────────────────────────────────────
+function DramaW20Reply() {
+  const kpis = [
+    { label: 'ROAS',             value: '0.051×', color: '#FF4466', sub: '目标 0.5×，差 10×' },
+    { label: 'Beacon Gap',       value: '60.8%',  color: '#FFB800', sub: 'CF 6,847 min vs DB 2,682 min' },
+    { label: 'Paywall → 支付',   value: '98%',    color: '#FF4466', sub: '296 → 6 InitiateCheckout' },
+  ];
+  const funnel = [
+    { step: '①', label: 'PageView',         n: 1516, pct: 100,  crit: false },
+    { step: '②', label: 'ViewContent',      n: 1516, pct: 100,  crit: false },
+    { step: '③', label: 'PlayStart',        n: 930,  pct: 61.3, crit: false },
+    { step: '④', label: 'WatchProgress',    n: 317,  pct: 20.9, crit: false },
+    { step: '⑤', label: 'PaywallView',      n: 296,  pct: 19.5, crit: false },
+    { step: '⑥', label: 'InitiateCheckout', n: 6,    pct: 0.4,  crit: true  },
+    { step: '⑦', label: 'Purchase',         n: 2,    pct: 0.13, crit: false },
+  ];
+  const actions = [
+    { sev: 'HIGH', task: 'beacon 触发挪到 player load()，修复 60.8% beacon gap' },
+    { sev: 'HIGH', task: '排查 PaywallView→Stripe 跳转链路，修复 98% paywall flush' },
+    { sev: 'HIGH', task: '信号量 < 30 时返回 insufficient_signal' },
+  ];
+  return (
+    <>
+      {/* ── Title ── */}
+      <M size={11} color={c.accent} upper bold style={{ display: 'block', letterSpacing: '0.1em' }}>
+        drama · W20 投放复盘 · 2026-05-13 → 2026-05-19
+      </M>
+
+      {/* ── KPI cards ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+        {kpis.map(k => (
+          <div key={k.label} style={{
+            background: 'rgba(0,0,0,0.25)',
+            border: `1px solid ${k.color}55`,
+            borderRadius: 8,
+            padding: '10px 12px',
+            boxShadow: `0 0 16px ${k.color}08 inset`,
+          }}>
+            <M size={8} color={c.textMute} upper style={{ display: 'block', marginBottom: 6, letterSpacing: '0.1em' }}>{k.label}</M>
+            <div style={{
+              fontFamily: c.mono, fontSize: 28, fontWeight: 200,
+              color: k.color, lineHeight: 1, marginBottom: 6,
+              letterSpacing: '-0.02em',
+              textShadow: `0 0 16px ${k.color}50`,
+            }}>{k.value}</div>
+            <M size={9} color={c.textMute} style={{ display: 'block', lineHeight: 1.5 }}>{k.sub}</M>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Funnel ── */}
+      <div style={{ background: c.bgCard, border: `1px solid ${c.border}`, borderRadius: 8, overflow: 'hidden' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '9px 14px', borderBottom: `1px solid ${c.border}` }}>
+          <M upper size={9} color={c.accent}>Full funnel · 7 nodes</M>
+          <M size={9} color={c.textMute}>act_800509389474426</M>
+        </div>
+        <div style={{ padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 7 }}>
+          {funnel.map(row => (
+            <div key={row.step} style={{ display: 'grid', gridTemplateColumns: '120px 1fr 52px', alignItems: 'center', gap: 10 }}>
+              <M size={9} color={row.crit ? '#FF4466' : c.textSec}>{row.step} {row.label}</M>
+              <div style={{ height: 14, background: 'rgba(255,255,255,0.04)', borderRadius: 3, overflow: 'hidden' }}>
+                <div style={{
+                  height: '100%',
+                  width: `${Math.max(row.pct, 0.5)}%`,
+                  background: row.crit
+                    ? 'linear-gradient(90deg,rgba(255,68,102,0.55),rgba(255,68,102,0.9))'
+                    : 'linear-gradient(90deg,rgba(0,177,162,0.4),rgba(0,177,162,0.8))',
+                  borderRadius: 3,
+                  boxShadow: row.crit ? '0 0 6px rgba(255,68,102,0.4)' : '0 0 5px rgba(0,177,162,0.25)',
+                }} />
+              </div>
+              <M size={10} color={row.crit ? '#FF4466' : c.textPri} bold style={{ textAlign: 'right' }}>
+                {row.n.toLocaleString()}
+              </M>
+            </div>
+          ))}
+        </div>
+        {/* Critical callout */}
+        <div style={{ margin: '0 14px 12px', borderLeft: '3px solid #FF4466', padding: '8px 12px', background: 'rgba(255,68,102,0.04)', borderRadius: '0 4px 4px 0' }}>
+          <M size={9} color="#FF4466" style={{ lineHeight: 1.7 }}>
+            ⑤→⑥ 流失 98% — 296 人看到付费墙，只有 6 人点击 Stripe。跳转链路疑似断裂。
+          </M>
+        </div>
+      </div>
+
+      {/* ── Actions ── */}
+      <div style={{ background: c.bgCard, border: `1px solid ${c.border}`, borderRadius: 8, overflow: 'hidden' }}>
+        <div style={{ padding: '9px 14px', borderBottom: `1px solid ${c.border}` }}>
+          <M upper size={9} color={c.accent}>Next week actions · W21</M>
+        </div>
+        <div style={{ padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {actions.map((a, i) => (
+            <div key={i} style={{ display: 'grid', gridTemplateColumns: '48px 1fr', gap: 10, alignItems: 'baseline' }}>
+              <span style={{
+                fontFamily: c.mono, fontSize: 8, padding: '2px 6px', borderRadius: 3,
+                background: 'rgba(255,68,102,0.14)', color: '#FF4466',
+                border: '1px solid rgba(255,68,102,0.35)',
+                textTransform: 'uppercase' as const, letterSpacing: '0.06em',
+                textAlign: 'center' as const,
+              }}>HIGH</span>
+              <M size={10} color={c.textPri} style={{ lineHeight: 1.6 }}>{a.task}</M>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Footer ── */}
+      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' as const }}>
+        <Badge text="ROAS 0.051×" variant="danger" />
+        <Badge text="3 critical issues" variant="danger" />
+        <Badge text="W20 · 7-day window" variant="muted" />
+        <Badge text="data live" variant="live" dot />
+      </div>
+      <M size={9} color={c.textMute} style={{ display: 'block', lineHeight: 1.6 }}>
+        Sources: Supabase PG · Stripe REST · CF Stream · Meta API × 2 · drama-pipeline-mcp v1.1
+      </M>
+    </>
+  );
+}
+
 const CHIP_REPLIES: Record<string, () => React.ReactNode> = {
   'Scale top ad sets':   () => <ScaleTopAdSetsReply />,
   'Pause underperforming': () => <PauseUnderperformingReply />,
@@ -1068,6 +1187,7 @@ const CHIP_REPLIES: Record<string, () => React.ReactNode> = {
   'Export report':       () => <ExportReportReply />,
   'A/B test variants':   () => <ABTestReply />,
   'Check pixel events':  () => <PixelEventsReply />,
+  'drama W20 复盘':      () => <DramaW20Reply />,
 };
 
 // ── Quick suggestions chips ───────────────────────────────────────────────────
@@ -1393,7 +1513,6 @@ export function CommChatContent({ msgs, typing, onAuthorize }: { msgs: ChatMsg[]
   const [usedChips, setUsedChips] = React.useState<Set<string>>(new Set());
   const [sessions, setSessions] = React.useState<SessionRecord[]>([]);
   const [showHistory, setShowHistory] = React.useState(false);
-  const [showReports, setShowReports] = React.useState(false);
 
   const handleAuthorize = () => {
     setSetupAuthorized(true);
@@ -1511,25 +1630,25 @@ export function CommChatContent({ msgs, typing, onAuthorize }: { msgs: ChatMsg[]
 
         {/* Right actions */}
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-        {/* Reports toggle */}
+        {/* Reports shortcut — injects drama W20 复盘 into chat */}
         <button
-          onClick={() => setShowReports(v => !v)}
+          onClick={() => handleChipSelect('drama W20 复盘')}
           style={{
             display: 'flex', alignItems: 'center', gap: 6,
-            background: showReports ? 'rgba(0,177,162,0.1)' : 'transparent',
-            border: `1px solid ${showReports ? 'rgba(0,177,162,0.3)' : c.border}`,
+            background: 'transparent',
+            border: `1px solid ${c.border}`,
             borderRadius: 6, padding: '5px 10px', cursor: 'pointer',
             transition: 'all 0.15s',
           }}
-          onMouseEnter={e => { if (!showReports) { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(0,177,162,0.25)'; (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,177,162,0.05)'; } }}
-          onMouseLeave={e => { if (!showReports) { (e.currentTarget as HTMLButtonElement).style.borderColor = c.border; (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; } }}
+          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(0,177,162,0.25)'; (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,177,162,0.05)'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = c.border; (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
         >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={showReports ? c.accent : c.textSec} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={c.textSec} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
             <line x1="18" y1="20" x2="18" y2="10"/>
             <line x1="12" y1="20" x2="12" y2="4"/>
             <line x1="6"  y1="20" x2="6"  y2="14"/>
           </svg>
-          <M size={9} color={showReports ? c.accent : c.textSec} upper style={{ letterSpacing: '0.07em' }}>Reports</M>
+          <M size={9} color={c.textSec} upper style={{ letterSpacing: '0.07em' }}>Reports</M>
         </button>
 
         {/* New chat */}
@@ -1911,43 +2030,6 @@ export function CommChatContent({ msgs, typing, onAuthorize }: { msgs: ChatMsg[]
 
         <div ref={bottomRef} />
       </div>
-
-      {/* ── Reports panel ── */}
-      {showReports && (
-        <div style={{
-          width: 580, flexShrink: 0,
-          borderLeft: `1px solid ${c.border}`,
-          display: 'flex', flexDirection: 'column',
-          overflow: 'hidden',
-          animation: 'historySlideIn 0.22s cubic-bezier(.2,0,.2,1) both',
-        }}>
-          {/* Panel title bar */}
-          <div style={{
-            height: 36, flexShrink: 0,
-            background: c.bgPanel,
-            borderBottom: `1px solid ${c.border}`,
-            display: 'flex', alignItems: 'center',
-            padding: '0 14px', gap: 8,
-          }}>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={c.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="20" x2="18" y2="10"/>
-              <line x1="12" y1="20" x2="12" y2="4"/>
-              <line x1="6"  y1="20" x2="6"  y2="14"/>
-            </svg>
-            <M size={9} color={c.accent} upper bold style={{ letterSpacing: '0.1em', flex: 1 }}>Reporting Engine</M>
-            <button
-              onClick={() => setShowReports(false)}
-              style={{ background: 'none', border: 'none', color: c.textMute, cursor: 'pointer', fontSize: 16, lineHeight: 1, padding: '2px 4px', transition: 'color 0.15s' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = c.textPri; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = c.textMute; }}
-            >×</button>
-          </div>
-          {/* Reports content scrollable */}
-          <div style={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
-            <ReportsContent />
-          </div>
-        </div>
-      )}
 
       </div>{/* end body row */}
 
