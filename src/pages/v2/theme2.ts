@@ -44,9 +44,9 @@ const lightVars = {
   textLabel:   '#5A8090',
   border:      'rgba(0,137,123,0.10)',
   borderStrong:'rgba(0,137,123,0.22)',
-  overlayBg:   'rgba(15,30,40,0.38)',
-  bgFloat:     'rgba(248,252,255,0.97)',
-  shadowColor: 'rgba(0,0,0,0.09)',
+  overlayBg:   'rgba(15,30,40,0.28)',
+  bgFloat:     'rgba(248,252,255,0.98)',
+  shadowColor: 'rgba(0,0,0,0.04)',
 };
 
 type Vars = typeof darkVars;
