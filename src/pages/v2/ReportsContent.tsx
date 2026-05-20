@@ -748,10 +748,10 @@ function ReportDetail({ projectId, onBack }: { projectId: string; onBack: () => 
             <div style={{ fontFamily: c.sans, fontSize: 24, fontWeight: 800, color: c.textPri, marginBottom: 6 }}>
               {project.name} 投放复盘
             </div>
-            <div style={{ fontFamily: c.mono, fontSize: 10, color: c.textSec, marginBottom: 4 }}>
+            <div style={{ fontFamily: c.mono, fontSize: 11, color: c.textPri, marginBottom: 5, opacity: 0.75 }}>
               2026-05-13 → 2026-05-19 · PopularReels &amp; Bestshort (act_800509389474426)
             </div>
-            <div style={{ fontFamily: c.mono, fontSize: 9, color: c.textMute }}>
+            <div style={{ fontFamily: c.mono, fontSize: 10, color: c.textSec }}>
               数据导向的 7 天产品 + 投放诊断：核心异常 / 漏斗瓶颈 / 流量真相 / 缺口 / 行动
             </div>
           </div>
