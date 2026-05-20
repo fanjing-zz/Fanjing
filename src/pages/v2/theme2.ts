@@ -28,6 +28,6 @@ export const c = {
   borderStrong: 'rgba(0,177,162,0.18)',
 
   // ── Fonts ─────────────────────────────────────────────────────────────────
-  mono: "'Space Mono','Courier New',monospace",
+  mono: "'Liberation Mono','Space Mono','Courier New',monospace",
   sans: "'Inter',system-ui,sans-serif",
 } as const;

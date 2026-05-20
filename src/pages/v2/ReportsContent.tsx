@@ -684,7 +684,7 @@ function HeroKPIRow() {
       {cards.map(card => (
         <div key={card.label} style={{ background: c.bgCard, border: `1px solid ${card.border}`, borderRadius: 8, padding: '18px 20px', boxShadow: card.shadow }}>
           <div style={{ fontFamily: c.mono, fontSize: 9, color: c.textMute, textTransform: 'uppercase' as const, letterSpacing: '0.12em', marginBottom: 10 }}>{card.label}</div>
-          <div style={{ fontFamily: c.mono, fontSize: 48, fontWeight: 700, color: card.valueColor, lineHeight: 1, marginBottom: 12, textShadow: `0 0 24px ${card.valueColor}60` }}>{card.value}</div>
+          <div style={{ fontFamily: c.mono, fontSize: 52, fontWeight: 200, color: card.valueColor, lineHeight: 1, marginBottom: 12, letterSpacing: '-0.02em', textShadow: `0 0 24px ${card.valueColor}40` }}>{card.value}</div>
           <div style={{ fontFamily: c.mono, fontSize: 10, color: c.textSec, lineHeight: 1.6 }}>{card.note}</div>
         </div>
       ))}
