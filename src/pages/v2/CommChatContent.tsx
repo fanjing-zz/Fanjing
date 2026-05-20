@@ -1567,27 +1567,6 @@ export function CommChatContent({ msgs, typing, onAuthorize }: { msgs: ChatMsg[]
 
         {/* Right actions */}
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-        {/* Reports shortcut — injects drama W20 复盘 into chat */}
-        <button
-          onClick={() => handleChipSelect('Export report')}
-          style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-            background: 'transparent',
-            border: `1px solid ${c.border}`,
-            borderRadius: 6, padding: '5px 10px', cursor: 'pointer',
-            transition: 'all 0.15s',
-          }}
-          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(0,177,162,0.25)'; (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,177,162,0.05)'; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = c.border; (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
-        >
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={c.textSec} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <line x1="18" y1="20" x2="18" y2="10"/>
-            <line x1="12" y1="20" x2="12" y2="4"/>
-            <line x1="6"  y1="20" x2="6"  y2="14"/>
-          </svg>
-          <M size={9} color={c.textSec} upper style={{ letterSpacing: '0.07em' }}>Reports</M>
-        </button>
-
         {/* New chat */}
         <button
           onClick={handleNewChat}
