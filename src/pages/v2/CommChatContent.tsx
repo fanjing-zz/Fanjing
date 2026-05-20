@@ -1,6 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { c } from './theme2';
 import { ChatMsg } from './agentLogic';
+import { ReportsContent } from './ReportsContent';
 
 // ── Primitives ────────────────────────────────────────────────────────────────
 const M = ({ children, size = 11, color = c.textSec, upper = false, bold = false, style }: {
@@ -1392,6 +1393,7 @@ export function CommChatContent({ msgs, typing, onAuthorize }: { msgs: ChatMsg[]
   const [usedChips, setUsedChips] = React.useState<Set<string>>(new Set());
   const [sessions, setSessions] = React.useState<SessionRecord[]>([]);
   const [showHistory, setShowHistory] = React.useState(false);
+  const [showReports, setShowReports] = React.useState(false);
 
   const handleAuthorize = () => {
     setSetupAuthorized(true);
@@ -1507,6 +1509,29 @@ export function CommChatContent({ msgs, typing, onAuthorize }: { msgs: ChatMsg[]
         {/* Session label */}
         <M size={9} color={c.textMute} upper style={{ letterSpacing: '0.07em' }}>Lanbow Chat</M>
 
+        {/* Right actions */}
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+        {/* Reports toggle */}
+        <button
+          onClick={() => setShowReports(v => !v)}
+          style={{
+            display: 'flex', alignItems: 'center', gap: 6,
+            background: showReports ? 'rgba(0,177,162,0.1)' : 'transparent',
+            border: `1px solid ${showReports ? 'rgba(0,177,162,0.3)' : c.border}`,
+            borderRadius: 6, padding: '5px 10px', cursor: 'pointer',
+            transition: 'all 0.15s',
+          }}
+          onMouseEnter={e => { if (!showReports) { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(0,177,162,0.25)'; (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,177,162,0.05)'; } }}
+          onMouseLeave={e => { if (!showReports) { (e.currentTarget as HTMLButtonElement).style.borderColor = c.border; (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; } }}
+        >
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={showReports ? c.accent : c.textSec} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"/>
+            <line x1="12" y1="20" x2="12" y2="4"/>
+            <line x1="6"  y1="20" x2="6"  y2="14"/>
+          </svg>
+          <M size={9} color={showReports ? c.accent : c.textSec} upper style={{ letterSpacing: '0.07em' }}>Reports</M>
+        </button>
+
         {/* New chat */}
         <button
           onClick={handleNewChat}
@@ -1524,6 +1549,7 @@ export function CommChatContent({ msgs, typing, onAuthorize }: { msgs: ChatMsg[]
           </svg>
           <M size={9} color={c.textSec} upper style={{ letterSpacing: '0.07em' }}>New Chat</M>
         </button>
+        </div>{/* end right actions */}
       </div>
 
       {/* ── Body: history panel + messages ── */}
@@ -1885,6 +1911,43 @@ export function CommChatContent({ msgs, typing, onAuthorize }: { msgs: ChatMsg[]
 
         <div ref={bottomRef} />
       </div>
+
+      {/* ── Reports panel ── */}
+      {showReports && (
+        <div style={{
+          width: 580, flexShrink: 0,
+          borderLeft: `1px solid ${c.border}`,
+          display: 'flex', flexDirection: 'column',
+          overflow: 'hidden',
+          animation: 'historySlideIn 0.22s cubic-bezier(.2,0,.2,1) both',
+        }}>
+          {/* Panel title bar */}
+          <div style={{
+            height: 36, flexShrink: 0,
+            background: c.bgPanel,
+            borderBottom: `1px solid ${c.border}`,
+            display: 'flex', alignItems: 'center',
+            padding: '0 14px', gap: 8,
+          }}>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={c.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"/>
+              <line x1="12" y1="20" x2="12" y2="4"/>
+              <line x1="6"  y1="20" x2="6"  y2="14"/>
+            </svg>
+            <M size={9} color={c.accent} upper bold style={{ letterSpacing: '0.1em', flex: 1 }}>Reporting Engine</M>
+            <button
+              onClick={() => setShowReports(false)}
+              style={{ background: 'none', border: 'none', color: c.textMute, cursor: 'pointer', fontSize: 16, lineHeight: 1, padding: '2px 4px', transition: 'color 0.15s' }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.color = c.textPri; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.color = c.textMute; }}
+            >×</button>
+          </div>
+          {/* Reports content scrollable */}
+          <div style={{ flex: 1, overflow: 'auto', display: 'flex', flexDirection: 'column' }}>
+            <ReportsContent />
+          </div>
+        </div>
+      )}
 
       </div>{/* end body row */}
 
