@@ -205,7 +205,7 @@ function StatusMix() {
     { label: 'FAILED',  val: 0,  color: '#EF4444' },
   ];
   return (
-    <div style={{ width: 252, flexShrink: 0, background: c.bgCard, border: `1px solid ${c.border}`, borderRadius: 8, padding: '16px 20px' }}>
+    <div style={{ width: 252, flexShrink: 0, background: c.bgCard, border: `1px solid ${c.border}`, borderRadius: 8, padding: '16px 20px', height: '100%', boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <Mono size={7} color={c.textMute} upper>VIS · 04B</Mono>
@@ -213,7 +213,7 @@ function StatusMix() {
         </div>
         <Mono size={7} color={c.textMute}>● 0 Live</Mono>
       </div>
-      <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: 16, alignItems: 'center', flex: 1 }}>
         <svg width={104} height={104} viewBox="0 0 104 104" style={{ flexShrink: 0 }}>
           {/* Track */}
           <circle cx={CX} cy={CY} r={R} fill="none" stroke="#2a2a2a" strokeWidth={11} />
@@ -513,7 +513,7 @@ export function CampaignsContent({
           <Sel id="camp-funnel" selectedId={selectedId} onSelect={onSelect} style={{ flex: 1 }}>
             <SubmissionFunnel />
           </Sel>
-          <Sel id="camp-status-mix" selectedId={selectedId} onSelect={onSelect}>
+          <Sel id="camp-status-mix" selectedId={selectedId} onSelect={onSelect} style={{ display: 'flex', alignSelf: 'stretch' }}>
             <StatusMix />
           </Sel>
         </div>
