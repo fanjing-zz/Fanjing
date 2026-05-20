@@ -1134,9 +1134,9 @@ function buildReportHTML(): string {
     --danger: #FF4466;
     --info:   #3B82F6;
     --text-pri:  #BDD8E8;
-    --text-sec:  #3D6575;
-    --text-mute: #1E3545;
-    --text-label:#245060;
+    --text-sec:  #7AAFC0;
+    --text-mute: #3D6575;
+    --text-label:#4A7A8A;
     --border:        rgba(0,177,162,0.08);
     --border-strong: rgba(0,177,162,0.18);
     --mono: 'Liberation Mono', 'Space Mono', 'Courier New', monospace;
@@ -1165,7 +1165,7 @@ function buildReportHTML(): string {
   .kpi.danger{ border-color: rgba(255,68,102,0.35); box-shadow: 0 0 32px rgba(255,68,102,0.06) inset }
   .kpi.warning{ border-color: rgba(255,184,0,0.35); box-shadow: 0 0 32px rgba(255,184,0,0.06) inset }
   .kpi .lbl{ font-family: var(--mono); font-size: 9px; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 8px }
-  .kpi .val{ font-family: var(--mono); font-size: 56px; font-weight: 700; line-height: 1; letter-spacing: -0.02em }
+  .kpi .val{ font-family: var(--mono); font-size: 56px; font-weight: 200; line-height: 1; letter-spacing: -0.03em }
   .kpi .val.danger{ color: var(--danger); text-shadow: 0 0 16px rgba(255,68,102,0.45) }
   .kpi .val.warning{ color: var(--amber); text-shadow: 0 0 16px rgba(255,184,0,0.45) }
   .kpi .note{ font-family: var(--mono); font-size: 10px; color: var(--text-sec); margin-top: 10px; line-height:1.5 }
