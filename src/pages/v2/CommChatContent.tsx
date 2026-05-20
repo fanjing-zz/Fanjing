@@ -1007,7 +1007,7 @@ function ExportReportReply() {
         </div>
       </div>
 
-      {/* Footer */}
+      {/* Footer badges */}
       <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' as const }}>
         <Badge text="ROAS 0.051×" variant="danger" />
         <Badge text="3 critical issues" variant="danger" />
@@ -1017,8 +1017,224 @@ function ExportReportReply() {
       <M size={9} color={c.textMute} style={{ display: 'block', lineHeight: 1.6 }}>
         Sources: Supabase PG · Stripe REST · CF Stream · Meta API × 2 · drama-pipeline-mcp v1.1
       </M>
+
+      {/* Download row */}
+      <DownloadReportRow />
     </>
   );
+}
+
+function DownloadReportRow() {
+  const [state, setState] = React.useState<'idle' | 'loading' | 'done'>('idle');
+
+  const handleDownload = () => {
+    setState('loading');
+    setTimeout(() => {
+      const html = buildReportHTML();
+      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'drama-W20-投放复盘-2026-05-13_19.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      setState('done');
+    }, 800);
+  };
+
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      background: state === 'done' ? 'rgba(0,204,119,0.05)' : 'rgba(0,177,162,0.03)',
+      border: `1px solid ${state === 'done' ? 'rgba(0,204,119,0.2)' : 'rgba(0,177,162,0.14)'}`,
+      borderRadius: 8, padding: '10px 14px',
+      transition: 'all 0.3s',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+          stroke={state === 'done' ? '#00CC77' : c.accent}
+          strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+        <div>
+          <M size={10} color={c.textPri} style={{ display: 'block' }}>
+            drama-W20-投放复盘-2026-05-13_19.html
+          </M>
+          <M size={9} color={c.textMute}>
+            完整报告 · 7 模块 · 含漏斗 / KPI / 行动项 · Lanbow Report Engine v1.1
+          </M>
+        </div>
+      </div>
+      <button
+        onClick={handleDownload}
+        disabled={state !== 'idle'}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 6,
+          background: state === 'done'
+            ? 'rgba(0,204,119,0.12)'
+            : state === 'loading'
+              ? 'rgba(0,177,162,0.08)'
+              : 'rgba(0,177,162,0.10)',
+          border: `1px solid ${state === 'done' ? 'rgba(0,204,119,0.3)' : 'rgba(0,177,162,0.25)'}`,
+          borderRadius: 6, padding: '5px 12px', cursor: state === 'idle' ? 'pointer' : 'default',
+          transition: 'all 0.2s', flexShrink: 0,
+        }}
+      >
+        {state === 'loading' ? (
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={c.accent} strokeWidth="2.5"
+            style={{ animation: 'rpt-gen-spin 1s linear infinite' }}>
+            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+          </svg>
+        ) : state === 'done' ? (
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#00CC77" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        ) : (
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={c.accent} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        )}
+        <M size={9} color={state === 'done' ? '#00CC77' : c.accent} upper style={{ letterSpacing: '0.07em' }}>
+          {state === 'loading' ? 'Generating…' : state === 'done' ? 'Downloaded' : 'Download'}
+        </M>
+      </button>
+    </div>
+  );
+}
+
+function buildReportHTML(): string {
+  return `<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>drama W20 投放复盘 · 2026-05-13 → 2026-05-19</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#071015;color:#BDD8E8;font-family:'Liberation Mono','Space Mono','Courier New',monospace;padding:40px 48px;line-height:1.6}
+  h1{font-size:24px;font-weight:800;font-family:Inter,system-ui,sans-serif;margin-bottom:6px}
+  h2{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#00B1A2;margin:28px 0 12px;border-bottom:1px solid rgba(0,177,162,.12);padding-bottom:6px}
+  .meta{font-size:10px;color:#3D6575;margin-bottom:4px}
+  .kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:0}
+  .kpi{border-radius:8px;padding:16px 18px;border:1px solid}
+  .kpi .label{font-size:8px;text-transform:uppercase;letter-spacing:.12em;color:#1E3545;margin-bottom:8px}
+  .kpi .value{font-size:42px;font-weight:200;line-height:1;letter-spacing:-.02em;margin-bottom:8px}
+  .kpi .note{font-size:9px;color:#3D6575}
+  .danger{border-color:rgba(255,68,102,.3);background:rgba(255,68,102,.03)}
+  .warn{border-color:rgba(255,184,0,.3);background:rgba(255,184,0,.03)}
+  .red{color:#FF4466}
+  .amber{color:#FFB800}
+  .green{color:#00CC77}
+  .accent{color:#00B1A2}
+  table{width:100%;border-collapse:collapse;font-size:10px}
+  th{font-size:8px;text-transform:uppercase;letter-spacing:.1em;color:#1E3545;text-align:left;padding:6px 0;border-bottom:1px solid rgba(0,177,162,.08)}
+  td{padding:7px 0;border-bottom:1px solid rgba(0,177,162,.05);color:#3D6575}
+  td.bold{color:#BDD8E8;font-weight:700}
+  .bar-wrap{height:14px;background:rgba(255,255,255,.04);border-radius:3;overflow:hidden}
+  .bar{height:100%;border-radius:3px}
+  .callout{border-left:3px solid #FF4466;padding:10px 14px;background:rgba(255,68,102,.04);border-radius:0 4px 4px 0;margin-top:12px;font-size:10px;color:#FF4466;line-height:1.7}
+  .action-row{display:grid;grid-template-columns:60px 90px 1fr;gap:12px;padding:10px 14px;background:rgba(0,0,0,.18);border:1px solid rgba(0,177,162,.08);border-radius:6px;margin-bottom:6px;align-items:baseline;font-size:10px}
+  .badge-high{background:rgba(255,68,102,.14);color:#FF4466;border:1px solid rgba(255,68,102,.35);border-radius:3px;padding:2px 8px;font-size:8px;text-transform:uppercase;letter-spacing:.06em;text-align:center}
+  .badge-med{background:rgba(255,184,0,.12);color:#FFB800;border:1px solid rgba(255,184,0,.35);border-radius:3px;padding:2px 8px;font-size:8px;text-transform:uppercase;letter-spacing:.06em;text-align:center}
+  .owner{background:rgba(255,255,255,.03);border:1px solid rgba(0,177,162,.08);border-radius:3px;padding:2px 8px;text-align:center;color:#3D6575}
+  .sources{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .src{background:rgba(0,0,0,.18);border:1px solid rgba(0,177,162,.08);border-radius:4px;padding:3px 10px;font-size:9px;color:#3D6575;display:inline-flex;align-items:center;gap:6px}
+  .dot{width:5px;height:5px;border-radius:50%;background:#00CC77;flex-shrink:0}
+  footer{margin-top:40px;font-size:9px;color:#1E3545;text-align:center;border-top:1px solid rgba(0,177,162,.06);padding-top:16px}
+</style>
+</head>
+<body>
+<h1>drama 投放复盘</h1>
+<div class="meta">2026-05-13 → 2026-05-19 · PopularReels &amp; Bestshort (act_800509389474426)</div>
+<div class="meta">数据导向的 7 天产品 + 投放诊断：核心异常 / 漏斗瓶颈 / 流量真相 / 缺口 / 行动</div>
+
+<h2>MOD-01 · Hero KPIs</h2>
+<div class="kpi-grid">
+  <div class="kpi danger"><div class="label">ROAS</div><div class="value red">0.051×</div><div class="note">投 $1 收 $0.05 · 目标 ROAS = 0.5，差 10×</div></div>
+  <div class="kpi warn"><div class="label">Beacon Coverage Gap</div><div class="value amber">60.8%</div><div class="note">CF Stream 6,847 min vs DB 2,682 min · ≈ 4,165 min 未被记录</div></div>
+  <div class="kpi danger"><div class="label">Paywall → Checkout 流失</div><div class="value red">98%</div><div class="note">296 PaywallView → 6 InitiateCheckout · 几乎没进 Stripe</div></div>
+</div>
+
+<h2>MOD-02 · Full Funnel · 7 Nodes</h2>
+<table>
+  <thead><tr><th>Stage</th><th>Count</th><th>Drop</th></tr></thead>
+  <tbody>
+    <tr><td>① PageView <em>(proxy)</em></td><td class="bold">1,516</td><td>—</td></tr>
+    <tr><td>② ViewContent <em>(proxy)</em></td><td class="bold">1,516</td><td>0.0%</td></tr>
+    <tr><td>③ PlayStart</td><td class="bold">930</td><td>−38.7%</td></tr>
+    <tr><td>④ WatchProgress</td><td class="bold">317</td><td>−65.9%</td></tr>
+    <tr><td>⑤ PaywallView <em>(proxy)</em></td><td class="bold">296</td><td>−6.6%</td></tr>
+    <tr><td>⑥ InitiateCheckout</td><td class="bold red">6</td><td class="red">−98.0%</td></tr>
+    <tr><td>⑦ Purchase</td><td class="bold">2</td><td>−66.7%</td></tr>
+  </tbody>
+</table>
+<div class="callout">主要漏洞：⑤→⑥ 流失 98%。296 人看到付费墙，只有 6 人点击 Stripe。</div>
+
+<h2>MOD-03 · Meta Ad Data · W20</h2>
+<table>
+  <thead><tr><th>Metric</th><th>Value</th><th>Metric</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td>Spend</td><td class="bold accent">$274.21</td><td>CTR</td><td class="bold amber">16.46% ⚠</td></tr>
+    <tr><td>外部收入</td><td class="bold">$13.99</td><td>Reach</td><td class="bold">42,741</td></tr>
+    <tr><td>Impressions</td><td class="bold">50,079</td><td>Frequency</td><td class="bold">1.17</td></tr>
+    <tr><td>Clicks</td><td class="bold accent">8,245</td><td>CPC</td><td class="bold amber">$0.033 ⚠</td></tr>
+  </tbody>
+</table>
+
+<h2>MOD-04 · Country Distribution · CF Stream</h2>
+<table>
+  <thead><tr><th>Country</th><th>Watch Time</th><th>Share</th></tr></thead>
+  <tbody>
+    <tr><td>🇵🇭 PH</td><td>785 min</td><td class="bold">11.5%</td></tr>
+    <tr><td>🇳🇬 NG</td><td>700 min</td><td class="bold">10.2%</td></tr>
+    <tr><td>🇺🇸 US</td><td>429 min</td><td class="bold">6.3%</td></tr>
+    <tr><td>🇨🇩 CD</td><td>419 min</td><td class="bold">6.1%</td></tr>
+    <tr><td>🇮🇩 ID</td><td>390 min</td><td class="bold">5.7%</td></tr>
+  </tbody>
+</table>
+
+<h2>MOD-05 · Known Data Gaps</h2>
+<table>
+  <thead><tr><th>Severity</th><th>Issue</th></tr></thead>
+  <tbody>
+    <tr><td class="red">CRIT</td><td>Beacon coverage gap ~60% — CF Stream 6,847 min vs DB 2,682 min</td></tr>
+    <tr><td class="red">CRIT</td><td>DB geo ≠ CF Stream geo — 新兴市场弱网失败用户不可见</td></tr>
+    <tr><td class="amber">WARN</td><td>Stripe 内部测试单占 31% — 真实付费仅 2 笔</td></tr>
+    <tr><td class="amber">WARN</td><td>Stripe customer_details 全空 — 用户未到填卡页</td></tr>
+    <tr><td style="color:#3B82F6">INFO</td><td>Subscribe→Purchase 命名漂移 — 事件未对齐，ROAS 分母错误</td></tr>
+  </tbody>
+</table>
+
+<h2>MOD-06 · Next Week Actions · W21</h2>
+<div class="action-row"><span class="badge-high">HIGH</span><span class="owner">product</span><span>beacon 触发挪到 player load()，修复 60.8% beacon gap</span></div>
+<div class="action-row"><span class="badge-high">HIGH</span><span class="owner">product</span><span>排查 PaywallView→Stripe 跳转链路，修复 98% paywall flush</span></div>
+<div class="action-row"><span class="badge-high">HIGH</span><span class="owner">analytics</span><span>信号量 &lt; 30 时返回 insufficient_signal</span></div>
+<div class="action-row"><span class="badge-med">MED</span><span class="owner">content</span><span>Top series 占 95.7% sessions，加单剧 dominance 警报</span></div>
+<div class="action-row"><span class="badge-med">MED</span><span class="owner">channels</span><span>DB/CF geo 不重合定位 PH/NG/CD 边缘节点 stall ratio + TTFF</span></div>
+
+<h2>MOD-07 · Sources</h2>
+<div class="sources">
+  <span class="src"><span class="dot"></span>Supabase PG (26 表)</span>
+  <span class="src"><span class="dot"></span>Stripe REST</span>
+  <span class="src"><span class="dot"></span>Cloudflare Stream</span>
+  <span class="src"><span class="dot"></span>Cloudflare Firewall</span>
+  <span class="src"><span class="dot"></span>Meta Marketing API ×2</span>
+  <span class="src"><span class="dot"></span>GitHub local clone</span>
+</div>
+
+<footer>
+  生成时间 2026-05-20 · 数据 100% 实测拉取 · 无人工填充 · 周期 2026-05-13 → 2026-05-19 (W20) · drama-pipeline-mcp v1.1<br/>
+  Generated by Lanbow Reporting Engine
+</footer>
+</body>
+</html>`;
 }
 
 function ABTestReply() {
