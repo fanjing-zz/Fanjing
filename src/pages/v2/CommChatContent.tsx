@@ -922,45 +922,101 @@ function RefreshRoasReply() {
 }
 
 function ExportReportReply() {
-  const metrics = [
-    { label: 'Impressions', value: '2.41M',  sub: '+8.3% wow',     color: c.accent },
-    { label: 'Clicks',      value: '18.7K',  sub: 'CTR 0.78%',     color: '#3B82F6' },
-    { label: 'Spend',       value: '$1,036', sub: '7-day total',    color: '#A78BFA' },
-    { label: 'ROAS',        value: '13.2×',  sub: 'vs 20× target', color: '#00CC77' },
-    { label: 'CPA',         value: '$1.94',  sub: 'per conversion', color: '#FFB800' },
-    { label: 'Conversions', value: '534',    sub: 'PURCHASE event', color: c.accent },
+  const kpis = [
+    { label: 'ROAS',           value: '0.051×', color: '#FF4466', sub: '目标 0.5×，差 10×' },
+    { label: 'Beacon Gap',     value: '60.8%',  color: '#FFB800', sub: 'CF 6,847 min vs DB 2,682 min' },
+    { label: 'Paywall → 支付', value: '98%',    color: '#FF4466', sub: '296 → 6 InitiateCheckout' },
+  ];
+  const funnel = [
+    { step: '①', label: 'PageView',         n: 1516, pct: 100,  crit: false },
+    { step: '②', label: 'ViewContent',      n: 1516, pct: 100,  crit: false },
+    { step: '③', label: 'PlayStart',        n: 930,  pct: 61.3, crit: false },
+    { step: '④', label: 'WatchProgress',    n: 317,  pct: 20.9, crit: false },
+    { step: '⑤', label: 'PaywallView',      n: 296,  pct: 19.5, crit: false },
+    { step: '⑥', label: 'InitiateCheckout', n: 6,    pct: 0.4,  crit: true  },
+    { step: '⑦', label: 'Purchase',         n: 2,    pct: 0.13, crit: false },
+  ];
+  const actions = [
+    'beacon 触发挪到 player load()，修复 60.8% beacon gap',
+    '排查 PaywallView→Stripe 跳转链路，修复 98% paywall flush',
+    '信号量 < 30 时返回 insufficient_signal',
   ];
   return (
     <>
       <M size={11} color={c.accent} upper bold style={{ display: 'block', letterSpacing: '0.1em' }}>
-        Q2 performance report · 7-day window
+        drama · W20 投放复盘 · 2026-05-13 → 2026-05-19
       </M>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
-        {metrics.map(m => (
-          <div key={m.label} style={{ background: c.bgCard, border: `1px solid ${c.border}`, borderRadius: 7, padding: '10px 12px' }}>
-            <M size={9} color={c.textMute} upper style={{ display: 'block', marginBottom: 4 }}>{m.label}</M>
-            <M size={14} color={m.color} bold style={{ display: 'block', letterSpacing: '-0.01em' }}>{m.value}</M>
-            <M size={8} color={c.textMute} style={{ display: 'block', marginTop: 2 }}>{m.sub}</M>
+
+      {/* KPI cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+        {kpis.map(k => (
+          <div key={k.label} style={{
+            background: 'rgba(0,0,0,0.25)', border: `1px solid ${k.color}55`,
+            borderRadius: 8, padding: '10px 12px', boxShadow: `0 0 16px ${k.color}08 inset`,
+          }}>
+            <M size={8} color={c.textMute} upper style={{ display: 'block', marginBottom: 6, letterSpacing: '0.1em' }}>{k.label}</M>
+            <div style={{ fontFamily: c.mono, fontSize: 28, fontWeight: 200, color: k.color, lineHeight: 1, marginBottom: 6, letterSpacing: '-0.02em', textShadow: `0 0 16px ${k.color}50` }}>{k.value}</div>
+            <M size={9} color={c.textMute} style={{ display: 'block', lineHeight: 1.5 }}>{k.sub}</M>
           </div>
         ))}
       </div>
-      <div style={{
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        background: 'rgba(0,204,119,0.05)', border: `1px solid rgba(0,204,119,0.2)`,
-        borderRadius: 8, padding: '10px 14px',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00CC77" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-          </svg>
-          <div>
-            <M size={10} color={c.textPri} style={{ display: 'block' }}>report_Q2_20250519.xlsx</M>
-            <M size={9} color={c.textMute}>2.4 MB · 5 campaigns · 74 ad sets · 7-day window</M>
-          </div>
+
+      {/* Funnel */}
+      <div style={{ background: c.bgCard, border: `1px solid ${c.border}`, borderRadius: 8, overflow: 'hidden' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '9px 14px', borderBottom: `1px solid ${c.border}` }}>
+          <M upper size={9} color={c.accent}>Full funnel · 7 nodes</M>
+          <M size={9} color={c.textMute}>act_800509389474426</M>
         </div>
-        <Badge text="Ready" variant="live" />
+        <div style={{ padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 7 }}>
+          {funnel.map(row => (
+            <div key={row.step} style={{ display: 'grid', gridTemplateColumns: '120px 1fr 52px', alignItems: 'center', gap: 10 }}>
+              <M size={9} color={row.crit ? '#FF4466' : c.textSec}>{row.step} {row.label}</M>
+              <div style={{ height: 14, background: 'rgba(255,255,255,0.04)', borderRadius: 3, overflow: 'hidden' }}>
+                <div style={{
+                  height: '100%', width: `${Math.max(row.pct, 0.5)}%`,
+                  background: row.crit
+                    ? 'linear-gradient(90deg,rgba(255,68,102,0.55),rgba(255,68,102,0.9))'
+                    : 'linear-gradient(90deg,rgba(0,177,162,0.4),rgba(0,177,162,0.8))',
+                  borderRadius: 3,
+                  boxShadow: row.crit ? '0 0 6px rgba(255,68,102,0.4)' : '0 0 5px rgba(0,177,162,0.25)',
+                }} />
+              </div>
+              <M size={10} color={row.crit ? '#FF4466' : c.textPri} bold style={{ textAlign: 'right' }}>{row.n.toLocaleString()}</M>
+            </div>
+          ))}
+        </div>
+        <div style={{ margin: '0 14px 12px', borderLeft: '3px solid #FF4466', padding: '8px 12px', background: 'rgba(255,68,102,0.04)', borderRadius: '0 4px 4px 0' }}>
+          <M size={9} color="#FF4466" style={{ lineHeight: 1.7 }}>
+            ⑤→⑥ 流失 98% — 296 人看到付费墙，只有 6 人点击 Stripe。跳转链路疑似断裂。
+          </M>
+        </div>
       </div>
+
+      {/* Actions */}
+      <div style={{ background: c.bgCard, border: `1px solid ${c.border}`, borderRadius: 8, overflow: 'hidden' }}>
+        <div style={{ padding: '9px 14px', borderBottom: `1px solid ${c.border}` }}>
+          <M upper size={9} color={c.accent}>Next week actions · W21</M>
+        </div>
+        <div style={{ padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {actions.map((task, i) => (
+            <div key={i} style={{ display: 'grid', gridTemplateColumns: '48px 1fr', gap: 10, alignItems: 'baseline' }}>
+              <span style={{ fontFamily: c.mono, fontSize: 8, padding: '2px 6px', borderRadius: 3, background: 'rgba(255,68,102,0.14)', color: '#FF4466', border: '1px solid rgba(255,68,102,0.35)', textTransform: 'uppercase' as const, letterSpacing: '0.06em', textAlign: 'center' as const }}>HIGH</span>
+              <M size={10} color={c.textPri} style={{ lineHeight: 1.6 }}>{task}</M>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' as const }}>
+        <Badge text="ROAS 0.051×" variant="danger" />
+        <Badge text="3 critical issues" variant="danger" />
+        <Badge text="W20 · 7-day window" variant="muted" />
+        <Badge text="data live" variant="live" dot />
+      </div>
+      <M size={9} color={c.textMute} style={{ display: 'block', lineHeight: 1.6 }}>
+        Sources: Supabase PG · Stripe REST · CF Stream · Meta API × 2 · drama-pipeline-mcp v1.1
+      </M>
     </>
   );
 }
@@ -1060,125 +1116,7 @@ function PixelEventsReply() {
   );
 }
 
-// ── drama W20 投放复盘 reply ──────────────────────────────────────────────────
-function DramaW20Reply() {
-  const kpis = [
-    { label: 'ROAS',             value: '0.051×', color: '#FF4466', sub: '目标 0.5×，差 10×' },
-    { label: 'Beacon Gap',       value: '60.8%',  color: '#FFB800', sub: 'CF 6,847 min vs DB 2,682 min' },
-    { label: 'Paywall → 支付',   value: '98%',    color: '#FF4466', sub: '296 → 6 InitiateCheckout' },
-  ];
-  const funnel = [
-    { step: '①', label: 'PageView',         n: 1516, pct: 100,  crit: false },
-    { step: '②', label: 'ViewContent',      n: 1516, pct: 100,  crit: false },
-    { step: '③', label: 'PlayStart',        n: 930,  pct: 61.3, crit: false },
-    { step: '④', label: 'WatchProgress',    n: 317,  pct: 20.9, crit: false },
-    { step: '⑤', label: 'PaywallView',      n: 296,  pct: 19.5, crit: false },
-    { step: '⑥', label: 'InitiateCheckout', n: 6,    pct: 0.4,  crit: true  },
-    { step: '⑦', label: 'Purchase',         n: 2,    pct: 0.13, crit: false },
-  ];
-  const actions = [
-    { sev: 'HIGH', task: 'beacon 触发挪到 player load()，修复 60.8% beacon gap' },
-    { sev: 'HIGH', task: '排查 PaywallView→Stripe 跳转链路，修复 98% paywall flush' },
-    { sev: 'HIGH', task: '信号量 < 30 时返回 insufficient_signal' },
-  ];
-  return (
-    <>
-      {/* ── Title ── */}
-      <M size={11} color={c.accent} upper bold style={{ display: 'block', letterSpacing: '0.1em' }}>
-        drama · W20 投放复盘 · 2026-05-13 → 2026-05-19
-      </M>
 
-      {/* ── KPI cards ── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
-        {kpis.map(k => (
-          <div key={k.label} style={{
-            background: 'rgba(0,0,0,0.25)',
-            border: `1px solid ${k.color}55`,
-            borderRadius: 8,
-            padding: '10px 12px',
-            boxShadow: `0 0 16px ${k.color}08 inset`,
-          }}>
-            <M size={8} color={c.textMute} upper style={{ display: 'block', marginBottom: 6, letterSpacing: '0.1em' }}>{k.label}</M>
-            <div style={{
-              fontFamily: c.mono, fontSize: 28, fontWeight: 200,
-              color: k.color, lineHeight: 1, marginBottom: 6,
-              letterSpacing: '-0.02em',
-              textShadow: `0 0 16px ${k.color}50`,
-            }}>{k.value}</div>
-            <M size={9} color={c.textMute} style={{ display: 'block', lineHeight: 1.5 }}>{k.sub}</M>
-          </div>
-        ))}
-      </div>
-
-      {/* ── Funnel ── */}
-      <div style={{ background: c.bgCard, border: `1px solid ${c.border}`, borderRadius: 8, overflow: 'hidden' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '9px 14px', borderBottom: `1px solid ${c.border}` }}>
-          <M upper size={9} color={c.accent}>Full funnel · 7 nodes</M>
-          <M size={9} color={c.textMute}>act_800509389474426</M>
-        </div>
-        <div style={{ padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 7 }}>
-          {funnel.map(row => (
-            <div key={row.step} style={{ display: 'grid', gridTemplateColumns: '120px 1fr 52px', alignItems: 'center', gap: 10 }}>
-              <M size={9} color={row.crit ? '#FF4466' : c.textSec}>{row.step} {row.label}</M>
-              <div style={{ height: 14, background: 'rgba(255,255,255,0.04)', borderRadius: 3, overflow: 'hidden' }}>
-                <div style={{
-                  height: '100%',
-                  width: `${Math.max(row.pct, 0.5)}%`,
-                  background: row.crit
-                    ? 'linear-gradient(90deg,rgba(255,68,102,0.55),rgba(255,68,102,0.9))'
-                    : 'linear-gradient(90deg,rgba(0,177,162,0.4),rgba(0,177,162,0.8))',
-                  borderRadius: 3,
-                  boxShadow: row.crit ? '0 0 6px rgba(255,68,102,0.4)' : '0 0 5px rgba(0,177,162,0.25)',
-                }} />
-              </div>
-              <M size={10} color={row.crit ? '#FF4466' : c.textPri} bold style={{ textAlign: 'right' }}>
-                {row.n.toLocaleString()}
-              </M>
-            </div>
-          ))}
-        </div>
-        {/* Critical callout */}
-        <div style={{ margin: '0 14px 12px', borderLeft: '3px solid #FF4466', padding: '8px 12px', background: 'rgba(255,68,102,0.04)', borderRadius: '0 4px 4px 0' }}>
-          <M size={9} color="#FF4466" style={{ lineHeight: 1.7 }}>
-            ⑤→⑥ 流失 98% — 296 人看到付费墙，只有 6 人点击 Stripe。跳转链路疑似断裂。
-          </M>
-        </div>
-      </div>
-
-      {/* ── Actions ── */}
-      <div style={{ background: c.bgCard, border: `1px solid ${c.border}`, borderRadius: 8, overflow: 'hidden' }}>
-        <div style={{ padding: '9px 14px', borderBottom: `1px solid ${c.border}` }}>
-          <M upper size={9} color={c.accent}>Next week actions · W21</M>
-        </div>
-        <div style={{ padding: '10px 14px', display: 'flex', flexDirection: 'column', gap: 6 }}>
-          {actions.map((a, i) => (
-            <div key={i} style={{ display: 'grid', gridTemplateColumns: '48px 1fr', gap: 10, alignItems: 'baseline' }}>
-              <span style={{
-                fontFamily: c.mono, fontSize: 8, padding: '2px 6px', borderRadius: 3,
-                background: 'rgba(255,68,102,0.14)', color: '#FF4466',
-                border: '1px solid rgba(255,68,102,0.35)',
-                textTransform: 'uppercase' as const, letterSpacing: '0.06em',
-                textAlign: 'center' as const,
-              }}>HIGH</span>
-              <M size={10} color={c.textPri} style={{ lineHeight: 1.6 }}>{a.task}</M>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Footer ── */}
-      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' as const }}>
-        <Badge text="ROAS 0.051×" variant="danger" />
-        <Badge text="3 critical issues" variant="danger" />
-        <Badge text="W20 · 7-day window" variant="muted" />
-        <Badge text="data live" variant="live" dot />
-      </div>
-      <M size={9} color={c.textMute} style={{ display: 'block', lineHeight: 1.6 }}>
-        Sources: Supabase PG · Stripe REST · CF Stream · Meta API × 2 · drama-pipeline-mcp v1.1
-      </M>
-    </>
-  );
-}
 
 const CHIP_REPLIES: Record<string, () => React.ReactNode> = {
   'Scale top ad sets':   () => <ScaleTopAdSetsReply />,
@@ -1187,7 +1125,6 @@ const CHIP_REPLIES: Record<string, () => React.ReactNode> = {
   'Export report':       () => <ExportReportReply />,
   'A/B test variants':   () => <ABTestReply />,
   'Check pixel events':  () => <PixelEventsReply />,
-  'drama W20 复盘':      () => <DramaW20Reply />,
 };
 
 // ── Quick suggestions chips ───────────────────────────────────────────────────
@@ -1632,7 +1569,7 @@ export function CommChatContent({ msgs, typing, onAuthorize }: { msgs: ChatMsg[]
         <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
         {/* Reports shortcut — injects drama W20 复盘 into chat */}
         <button
-          onClick={() => handleChipSelect('drama W20 复盘')}
+          onClick={() => handleChipSelect('Export report')}
           style={{
             display: 'flex', alignItems: 'center', gap: 6,
             background: 'transparent',
