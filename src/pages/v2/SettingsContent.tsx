@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { c } from './theme2';
+import { SOCIAL_ACCOUNTS, SocialAccount, SocialAuthStatus, SocialPlatform, PLATFORM_STYLE, AUTH_STATUS_STYLE } from './sharedData';
 
 // ─── Primitives ───────────────────────────────────────────────────────────────
 const M = ({ children, size = 11, color = c.textSec, upper = false, style }: {
@@ -117,19 +118,20 @@ function InputRow({ label, desc, value, last }: {
 }
 
 // ─── Connection card ──────────────────────────────────────────────────────────
-function ConnCard({ icon, name, sub, status, id }: {
+function ConnCard({ icon, name, sub, status, id, last }: {
   icon: React.ReactNode; name: string; sub: string;
-  status: 'connected' | 'pending' | 'error'; id?: string;
+  status: 'connected' | 'pending' | 'error'; id?: string; last?: boolean;
 }) {
   const cfg = {
-    connected: { color: '#00CC77', label: 'Connected', variant: 'live'  as const },
-    pending:   { color: '#FFB800', label: 'Pending',   variant: 'warn'  as const },
-    error:     { color: '#FF4466', label: 'Error',     variant: 'warn'  as const },
+    connected: { label: 'Connected', variant: 'live'  as const },
+    pending:   { label: 'Pending',   variant: 'warn'  as const },
+    error:     { label: 'Error',     variant: 'warn'  as const },
   }[status];
+  const actionLabel = status === 'connected' ? 'Manage' : status === 'error' ? 'Reconnect' : 'Connect';
   return (
     <div style={{
       display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px',
-      borderBottom: `1px solid ${c.border}`,
+      borderBottom: last ? 'none' : `1px solid ${c.border}`,
     }}>
       <div style={{
         width: 32, height: 32, borderRadius: 7, flexShrink: 0,
@@ -145,11 +147,99 @@ function ConnCard({ icon, name, sub, status, id }: {
         <Badge text={cfg.label} variant={cfg.variant} />
         <button style={{
           fontFamily: c.mono, fontSize: 8, padding: '3px 9px',
-          background: 'transparent', border: `1px solid ${c.border}`,
-          borderRadius: 3, color: c.textSec, cursor: 'pointer',
-          textTransform: 'uppercase', letterSpacing: '0.08em',
+          background: status === 'error' ? 'rgba(255,184,0,0.08)' : 'transparent',
+          border: `1px solid ${status === 'error' ? 'rgba(255,184,0,0.30)' : c.border}`,
+          borderRadius: 3,
+          color: status === 'error' ? '#FFB800' : c.textSec,
+          cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.08em',
         }}>
-          {status === 'connected' ? 'Manage' : 'Connect'}
+          {actionLabel}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Social account row (for Integrations section) ────────────────────────────
+const PLATFORM_ICON: Record<SocialPlatform, React.ReactNode> = {
+  meta: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+    </svg>
+  ),
+  tiktok: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"/>
+    </svg>
+  ),
+  google: (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M12 8v4l3 3"/>
+    </svg>
+  ),
+};
+
+function authToConnStatus(s: SocialAuthStatus): 'connected' | 'pending' | 'error' {
+  if (s === 'authorized') return 'connected';
+  if (s === 'pending')    return 'pending';
+  return 'error'; // expired | revoked
+}
+
+function SocialConnCard({ acc, last }: { acc: SocialAccount; last?: boolean }) {
+  const ps = PLATFORM_STYLE[acc.platform];
+  const connStatus = authToConnStatus(acc.status);
+  const subParts: string[] = [ps.label];
+  if (acc.pageId)  subParts.push(acc.pageId);
+  const lastSync = acc.lastSync !== '—' ? `Synced ${acc.lastSync}` : 'Not synced';
+
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'flex-start', gap: 12, padding: '12px 16px',
+      borderBottom: last ? 'none' : `1px solid ${c.border}`,
+    }}>
+      <div style={{
+        width: 32, height: 32, borderRadius: 7, flexShrink: 0,
+        background: ps.bg, border: `1px solid ${c.border}`,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: ps.color,
+      }}>{PLATFORM_ICON[acc.platform]}</div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 }}>
+          <M size={11} color={c.textPri}>{acc.displayName}</M>
+          <span style={{
+            fontFamily: c.mono, fontSize: 8, padding: '1px 5px',
+            background: ps.bg, color: ps.color,
+            border: `1px solid ${ps.color}33`,
+            borderRadius: 3, letterSpacing: '0.1em', textTransform: 'uppercase',
+          }}>{ps.label}</span>
+        </div>
+        <M size={9} color={c.textSec}>
+          Ad Account · <span style={{ color: c.accent }}>{acc.accountId}</span>
+        </M>
+        {acc.pixelId && (
+          <M size={9} color={c.textSec} style={{ display: 'block', marginTop: 1 }}>
+            Pixel · <span style={{ color: c.textSec }}>{acc.pixelId}</span>
+          </M>
+        )}
+        <M size={8} color={c.textMute} style={{ display: 'block', marginTop: 3 }}>
+          {lastSync} · {acc.linkedProjectIds.length} project{acc.linkedProjectIds.length !== 1 ? 's' : ''}
+        </M>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingTop: 2, flexShrink: 0 }}>
+        <Badge
+          text={AUTH_STATUS_STYLE[acc.status].label}
+          variant={acc.status === 'authorized' ? 'live' : acc.status === 'pending' ? 'muted' : 'warn'}
+        />
+        <button style={{
+          fontFamily: c.mono, fontSize: 8, padding: '3px 9px',
+          background: acc.status === 'expired' || acc.status === 'revoked' ? 'rgba(255,184,0,0.08)' : 'transparent',
+          border: `1px solid ${acc.status === 'expired' || acc.status === 'revoked' ? 'rgba(255,184,0,0.30)' : c.border}`,
+          borderRadius: 3,
+          color: acc.status === 'expired' || acc.status === 'revoked' ? '#FFB800' : c.textSec,
+          cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.08em',
+        }}>
+          {acc.status === 'authorized' ? 'Manage' : acc.status === 'pending' ? 'Connect' : 'Reconnect'}
         </button>
       </div>
     </div>
@@ -212,22 +302,19 @@ export function SettingsContent() {
             <InputRow label="Email"         value="siye@sandwichlab.ai" last />
           </Section>
 
-          {/* Integrations */}
-          <Section title="Integrations">
-            <ConnCard
-              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>}
-              name="Meta Ads"
-              sub="Ad Account"
-              id="8048 9042 9093 816"
-              status="connected"
-            />
-            <ConnCard
-              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>}
-              name="Meta Pixel"
-              sub="Dataset"
-              id="8834 8266 7767 853"
-              status="connected"
-            />
+          {/* Integrations — Ad Accounts (from shared data) */}
+          <Section title="Ad Accounts">
+            {SOCIAL_ACCOUNTS.map((acc, i) => (
+              <SocialConnCard
+                key={acc.id}
+                acc={acc}
+                last={i === SOCIAL_ACCOUNTS.length - 1}
+              />
+            ))}
+          </Section>
+
+          {/* Integrations — Platform Connections */}
+          <Section title="Platform Connections">
             <ConnCard
               icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>}
               name="Feishu / Lark"
@@ -240,13 +327,7 @@ export function SettingsContent() {
               name="Analytics API"
               sub="Real-time data feed"
               status="pending"
-            />
-            <ConnCard
-              icon={<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>}
-              name="Facebook Public Page"
-              sub="LexiCollection_85"
-              id="8313 5178 0067 375"
-              status="connected"
+              last
             />
           </Section>
 
