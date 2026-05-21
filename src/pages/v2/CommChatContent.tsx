@@ -2,6 +2,200 @@ import React, { useRef, useEffect } from 'react';
 import { c } from './theme2';
 import { ChatMsg } from './agentLogic';
 
+// ── Project data ──────────────────────────────────────────────────────────────
+type ProjectStatus = 'active' | 'paused' | 'draft' | 'completed';
+interface Project {
+  id: string; name: string; status: ProjectStatus;
+  budget: string; roas: number; spend: string;
+  adSets: number; campaigns: number; geo: string;
+  updated: string; platform: string[];
+  insights: string;
+}
+const PROJECTS: Project[] = [
+  { id: 'PRJ-001', name: 'Q2 Romance Series', status: 'active',
+    budget: '$74/day', roas: 4.8, spend: '$2,180', adSets: 74, campaigns: 5,
+    geo: 'US · CA · GB · AU', updated: '2h ago', platform: ['Meta'],
+    insights: 'ROAS above target. "Beyond the Horizon" underperforming at 3.2× — recommend bid review.' },
+  { id: 'PRJ-002', name: 'Beyond the Horizon', status: 'paused',
+    budget: '$28/day', roas: 3.2, spend: '$640', adSets: 18, campaigns: 2,
+    geo: 'US', updated: '1d ago', platform: ['Meta'],
+    insights: 'Below 4.0× ROAS floor. Paused pending creative refresh and audience expansion.' },
+  { id: 'PRJ-003', name: 'Summer Launch 2025', status: 'draft',
+    budget: '$120/day', roas: 0, spend: '—', adSets: 0, campaigns: 3,
+    geo: 'US · CA', updated: '3d ago', platform: ['Meta', 'TikTok'],
+    insights: 'Campaign structure complete. Awaiting creative assets and final budget approval.' },
+  { id: 'PRJ-004', name: 'LexiCollection Spring', status: 'completed',
+    budget: '$55/day', roas: 6.1, spend: '$8,430', adSets: 42, campaigns: 4,
+    geo: 'US · GB · AU', updated: '1w ago', platform: ['Meta'],
+    insights: 'Campaign ended. Final ROAS 6.1× — strongest performer this quarter.' },
+  { id: 'PRJ-005', name: 'Evergreen Core', status: 'active',
+    budget: '$90/day', roas: 5.3, spend: '$3,760', adSets: 31, campaigns: 3,
+    geo: 'US · CA', updated: '4h ago', platform: ['Meta'],
+    insights: 'Stable retargeting loop. Frequency rising — consider audience refresh in 5–7 days.' },
+];
+
+const PROJECT_STATUS_STYLE: Record<ProjectStatus, { label: string; color: string; bg: string; border: string }> = {
+  active:    { label: 'Active',    color: c.green,    bg: 'rgba(0,204,119,0.10)',    border: 'rgba(0,204,119,0.25)' },
+  paused:    { label: 'Paused',    color: c.textMute, bg: c.bgCard,                  border: c.border },
+  draft:     { label: 'Draft',     color: c.blue,     bg: 'rgba(59,130,246,0.10)',   border: 'rgba(59,130,246,0.25)' },
+  completed: { label: 'Completed', color: c.accent,   bg: c.accentDim,               border: c.borderStrong },
+};
+
+// Keyword detection — triggers project picker
+const PROJECT_QUERY_KEYWORDS = [
+  '项目', '数据', '报告', '活动', '广告效果', '表现', '情况', '怎么样', '看看', '查看', '哪个',
+  'report', 'project', 'data', 'campaign', 'performance', 'stats', 'which',
+];
+function isProjectQuery(text: string): boolean {
+  const t = text.toLowerCase();
+  const hits = PROJECT_QUERY_KEYWORDS.filter(kw => t.includes(kw)).length;
+  // Vague if short + has at least 1 keyword but no specific project name
+  const mentionsProject = PROJECTS.some(p => t.includes(p.name.toLowerCase()) || t.includes(p.id.toLowerCase()));
+  return hits >= 1 && !mentionsProject && text.length < 60;
+}
+
+// ── ProjectPicker ─────────────────────────────────────────────────────────────
+function ProjectPicker({ onSelect }: { onSelect: (p: Project) => void }) {
+  const [hov, setHov] = React.useState<string | null>(null);
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%' }}>
+      <M size={11} color={c.textSec} style={{ display: 'block', marginBottom: 2 }}>
+        请选择您要查看的项目：
+      </M>
+      {PROJECTS.map(p => {
+        const st = PROJECT_STATUS_STYLE[p.status];
+        const isHov = hov === p.id;
+        return (
+          <div
+            key={p.id}
+            onClick={() => onSelect(p)}
+            onMouseEnter={() => setHov(p.id)}
+            onMouseLeave={() => setHov(null)}
+            style={{
+              display: 'grid', gridTemplateColumns: '1fr auto',
+              alignItems: 'center', gap: 12,
+              padding: '11px 14px',
+              background: isHov ? c.accentDim : c.bgCard,
+              border: `1px solid ${isHov ? c.borderStrong : c.border}`,
+              borderRadius: 8, cursor: 'pointer',
+              transition: 'all 0.14s',
+            }}
+          >
+            <div style={{ minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                <M size={8} color={c.textMute} upper>{p.id}</M>
+                <span style={{
+                  fontFamily: c.mono, fontSize: 8, padding: '2px 7px',
+                  background: st.bg, color: st.color, border: `1px solid ${st.border}`,
+                  borderRadius: 3, letterSpacing: '0.1em', textTransform: 'uppercase',
+                }}>{st.label}</span>
+              </div>
+              <div style={{ fontFamily: c.sans, fontSize: 12, fontWeight: 600, color: c.textPri, marginBottom: 5, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {p.name}
+              </div>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                <M size={9} color={c.textMute}>{p.campaigns} campaigns · {p.adSets} ad sets</M>
+                <M size={9} color={c.textMute}>{p.geo}</M>
+                <M size={9} color={c.textMute}>Updated {p.updated}</M>
+              </div>
+            </div>
+            <div style={{ textAlign: 'right', flexShrink: 0 }}>
+              {p.roas > 0 ? (
+                <>
+                  <div style={{ fontFamily: c.mono, fontSize: 16, fontWeight: 300, color: p.roas >= 4 ? c.green : p.roas >= 3 ? '#FFB800' : '#FF4466', lineHeight: 1 }}>
+                    {p.roas.toFixed(1)}×
+                  </div>
+                  <M size={8} color={c.textMute} upper>ROAS</M>
+                </>
+              ) : (
+                <M size={9} color={c.textMute}>—</M>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── ProjectDetail ─────────────────────────────────────────────────────────────
+function ProjectDetail({ projectId }: { projectId: string }) {
+  const p = PROJECTS.find(x => x.id === projectId);
+  if (!p) return null;
+  const st = PROJECT_STATUS_STYLE[p.status];
+  const roasColor = p.roas >= 4 ? c.green : p.roas >= 3 ? '#FFB800' : '#FF4466';
+
+  const metrics = [
+    { k: 'CAMPAIGNS',  v: String(p.campaigns) },
+    { k: 'AD SETS',    v: String(p.adSets) },
+    { k: 'DAILY BUDGET', v: p.budget },
+    { k: 'TOTAL SPEND',  v: p.spend },
+    { k: 'GEO',        v: p.geo },
+    { k: 'PLATFORM',   v: p.platform.join(' · ') },
+  ];
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5 }}>
+            <M size={8} color={c.textMute} upper>{p.id}</M>
+            <span style={{
+              fontFamily: c.mono, fontSize: 8, padding: '2px 7px',
+              background: st.bg, color: st.color, border: `1px solid ${st.border}`,
+              borderRadius: 3, letterSpacing: '0.1em', textTransform: 'uppercase',
+            }}>{st.label}</span>
+          </div>
+          <div style={{ fontFamily: c.sans, fontSize: 15, fontWeight: 700, color: c.textPri }}>{p.name}</div>
+          <M size={9} color={c.textMute} style={{ display: 'block', marginTop: 3 }}>Updated {p.updated}</M>
+        </div>
+        {p.roas > 0 && (
+          <div style={{ textAlign: 'right', flexShrink: 0 }}>
+            <div style={{ fontFamily: c.mono, fontSize: 28, fontWeight: 200, color: roasColor, lineHeight: 1 }}>{p.roas.toFixed(1)}×</div>
+            <M size={8} color={c.textMute} upper>ROAS</M>
+          </div>
+        )}
+      </div>
+
+      {/* Metrics grid */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 1, background: c.border, borderRadius: 7, overflow: 'hidden' }}>
+        {metrics.map(({ k, v }) => (
+          <div key={k} style={{ background: c.bgCard, padding: '9px 12px' }}>
+            <M size={8} color={c.textMute} upper style={{ display: 'block', marginBottom: 3 }}>{k}</M>
+            <M size={11} color={c.textPri} bold>{v || '—'}</M>
+          </div>
+        ))}
+      </div>
+
+      {/* Insights */}
+      <div style={{
+        padding: '10px 12px',
+        background: c.accentDim, border: `1px solid ${c.borderStrong}`,
+        borderRadius: 7, borderLeft: `3px solid ${c.accent}`,
+      }}>
+        <M size={8} color={c.accent} upper bold style={{ display: 'block', marginBottom: 4 }}>AI Insight</M>
+        <M size={11} color={c.textSec} style={{ display: 'block', lineHeight: 1.7 }}>{p.insights}</M>
+      </div>
+
+      {/* Actions */}
+      <div style={{ display: 'flex', gap: 8 }}>
+        {['查看完整报告', '调整预算', '暂停活动'].map(label => (
+          <button key={label} style={{
+            fontFamily: c.mono, fontSize: 9, padding: '6px 12px',
+            background: 'transparent', border: `1px solid ${c.border}`,
+            borderRadius: 5, color: c.textSec, cursor: 'pointer',
+            letterSpacing: '0.06em', transition: 'all 0.14s',
+          }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = c.borderStrong; e.currentTarget.style.color = c.textPri; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = c.border; e.currentTarget.style.color = c.textSec; }}
+          >{label}</button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ── Primitives ────────────────────────────────────────────────────────────────
 const M = ({ children, size = 11, color = c.textSec, upper = false, bold = false, style }: {
   children: React.ReactNode; size?: number; color?: string;
@@ -1859,7 +2053,7 @@ export function CommChatContent({ msgs, typing, onAuthorize }: { msgs: ChatMsg[]
   const bottomRef = useRef<HTMLDivElement>(null);
   const [inputVal, setInputVal] = React.useState('');
   const [inputFocused, setInputFocused] = React.useState(false);
-  const [localMsgs, setLocalMsgs] = React.useState<{ id: string; role: 'user' | 'agent'; text?: string; chipKey?: string }[]>([]);
+  const [localMsgs, setLocalMsgs] = React.useState<{ id: string; role: 'user' | 'agent'; text?: string; chipKey?: string; msgType?: 'project-picker' | 'project-detail'; projectId?: string }[]>([]);
   const [localTyping, setLocalTyping] = React.useState(false);
   const [showPreset, setShowPreset] = React.useState(false);
   const [showSetup, setShowSetup] = React.useState(false);
@@ -1917,19 +2111,37 @@ export function CommChatContent({ msgs, typing, onAuthorize }: { msgs: ChatMsg[]
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [msgs, typing, localMsgs, localTyping]);
 
+  const handleProjectSelect = React.useCallback((proj: Project) => {
+    const id = Date.now().toString();
+    setLocalMsgs(p => [...p, { id, role: 'user', text: `查看 ${proj.name} 的数据` }]);
+    setLocalTyping(true);
+    setTimeout(() => {
+      setLocalTyping(false);
+      setLocalMsgs(p => [...p, { id: id + '_r', role: 'agent', msgType: 'project-detail', projectId: proj.id }]);
+    }, 900);
+  }, []);
+
   const sendMessage = (text: string) => {
     if (!text.trim()) return;
     const id = Date.now().toString();
     setLocalMsgs(p => [...p, { id, role: 'user', text }]);
     setInputVal('');
     setLocalTyping(true);
-    setTimeout(() => {
-      setLocalTyping(false);
-      setLocalMsgs(p => [...p, {
-        id: id + '_r', role: 'agent',
-        text: 'Understood. Analyzing current campaign data and ROAS signals. I\'ll have a full recommendation ready shortly.',
-      }]);
-    }, 1800);
+    if (isProjectQuery(text)) {
+      // Vague project query → show project picker
+      setTimeout(() => {
+        setLocalTyping(false);
+        setLocalMsgs(p => [...p, { id: id + '_r', role: 'agent', msgType: 'project-picker' }]);
+      }, 1000);
+    } else {
+      setTimeout(() => {
+        setLocalTyping(false);
+        setLocalMsgs(p => [...p, {
+          id: id + '_r', role: 'agent',
+          text: 'Understood. Analyzing current campaign data and ROAS signals. I\'ll have a full recommendation ready shortly.',
+        }]);
+      }, 1800);
+    }
   };
 
   const handleChipSelect = (text: string) => {
@@ -2354,9 +2566,13 @@ export function CommChatContent({ msgs, typing, onAuthorize }: { msgs: ChatMsg[]
         {localMsgs.map(msg =>
           msg.role === 'user'
             ? <LocalUserMsg key={msg.id} text={msg.text ?? ''} />
-            : msg.chipKey
-              ? <AgentBlock key={msg.id}>{CHIP_REPLIES[msg.chipKey]?.()}</AgentBlock>
-              : <LocalAgentMsg key={msg.id} text={msg.text ?? ''} />
+            : msg.msgType === 'project-picker'
+              ? <AgentBlock key={msg.id}><ProjectPicker onSelect={handleProjectSelect} /></AgentBlock>
+              : msg.msgType === 'project-detail'
+                ? <AgentBlock key={msg.id}><ProjectDetail projectId={msg.projectId!} /></AgentBlock>
+                : msg.chipKey
+                  ? <AgentBlock key={msg.id}>{CHIP_REPLIES[msg.chipKey]?.()}</AgentBlock>
+                  : <LocalAgentMsg key={msg.id} text={msg.text ?? ''} />
         )}
         {localTyping && <TypingIndicator />}
 
