@@ -12,12 +12,8 @@ if (typeof document !== 'undefined' && !document.getElementById(STYLE_ID)) {
       to   { opacity: 1; transform: translateY(0);    }
     }
     @keyframes camp-pulse {
-      0%, 100% { opacity: 1;   box-shadow: 0 0 5px #FFB800; }
-      50%       { opacity: 0.5; box-shadow: 0 0 2px #FFB800; }
-    }
-    @keyframes camp-accent-pulse {
-      0%, 100% { box-shadow: 0 0 6px rgba(0,177,162,0.5); }
-      50%       { box-shadow: 0 0 14px rgba(0,177,162,0.9); }
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.45; }
     }
     @keyframes camp-spin-in {
       from { stroke-dasharray: 0 999; }
@@ -179,7 +175,7 @@ function SubmissionFunnel() {
                 background: `linear-gradient(90deg, ${c.accent}60, ${c.accent}99)`,
                 borderRadius: 3,
                 transition: `width 0.7s cubic-bezier(0.4,0,0.2,1) ${row.delay + 100}ms`,
-                boxShadow: mounted ? `0 0 6px ${c.accent}40` : 'none',
+                boxShadow: 'none',
               }} />
             </div>
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 5, minWidth: 140, justifyContent: 'flex-end' }}>
@@ -306,8 +302,8 @@ function CampaignTree() {
               }}>›</span>
               <span style={{
                 width: 8, height: 8, borderRadius: '50%', background: camp.dotColor, flexShrink: 0,
-                boxShadow: camp.dotColor !== '#888' ? `0 0 6px ${camp.dotColor}90` : 'none',
-                animation: camp.dotColor === c.accent ? 'camp-accent-pulse 2s ease infinite' : 'none',
+                boxShadow: 'none',
+                animation: 'none',
               }} />
               <Mono size={10} color={c.textPri} bold style={{ flex: 1 }}>{camp.id}</Mono>
               <Mono size={8} color={c.textMute} style={{ minWidth: 64 }}>{camp.code}</Mono>
@@ -479,7 +475,6 @@ export function CampaignsContent({
         }}>
           <div style={{
             width: 5, height: 5, borderRadius: '50%', background: '#FFB800',
-            animation: 'camp-pulse 2s ease-in-out infinite',
           }} />
           <Mono size={9} color="#FFB800" upper>All Paused · Waiting Launch</Mono>
         </div>

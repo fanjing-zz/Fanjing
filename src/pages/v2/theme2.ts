@@ -21,6 +21,7 @@ const darkVars = {
   borderStrong:'rgba(0,177,162,0.18)',
   overlayBg:   'rgba(4,10,14,0.55)',
   bgFloat:     'rgba(7,16,21,0.96)',
+  bgFrost:     'rgba(7,16,21,0.78)',
   shadowColor: 'rgba(0,0,0,0.60)',
 };
 
@@ -46,6 +47,7 @@ const lightVars = {
   borderStrong:'rgba(0,137,123,0.22)',
   overlayBg:   'rgba(15,30,40,0.28)',
   bgFloat:     'rgba(248,252,255,0.98)',
+  bgFrost:     'rgba(239,244,247,0.78)',
   shadowColor: 'rgba(0,0,0,0.04)',
 };
 
@@ -73,6 +75,7 @@ const CSS_VARS: Record<keyof Vars, string> = {
   borderStrong:'--c-border-strong',
   overlayBg:   '--c-overlay-bg',
   bgFloat:     '--c-bg-float',
+  bgFrost:     '--c-bg-frost',
   shadowColor: '--c-shadow-color',
 };
 
@@ -111,6 +114,7 @@ export const c = {
   borderStrong:'var(--c-border-strong)',
   overlayBg:   'var(--c-overlay-bg)',
   bgFloat:     'var(--c-bg-float)',
+  bgFrost:     'var(--c-bg-frost)',
   shadowColor: 'var(--c-shadow-color)',
   mono: "'Liberation Mono','Space Mono','Courier New',monospace",
   sans: "'Inter',system-ui,sans-serif",

@@ -82,7 +82,7 @@ function CampaignPerformance() {
                 {cp.title}
               </M>
               <div style={{ position: 'relative', height: 4, background: 'rgba(255,255,255,0.05)', borderRadius: 2 }}>
-                <div style={{ position: 'absolute', left: 0, top: 0, height: '100%', width: `${barPct}%`, background: color, borderRadius: 2, opacity: 0.72, boxShadow: cp.status !== 'below' ? `0 0 5px ${color}` : 'none' }} />
+                <div style={{ position: 'absolute', left: 0, top: 0, height: '100%', width: `${barPct}%`, background: color, borderRadius: 2, opacity: 0.72 }} />
                 <div style={{ position: 'absolute', left: `${minPct}%`, top: -2, bottom: -2, width: 1, background: '#FF4466', opacity: 0.45 }} />
                 <div style={{ position: 'absolute', left: `${tgtPct}%`, top: -2, bottom: -2, width: 1, background: '#FFB800', opacity: 0.45 }} />
               </div>
@@ -135,7 +135,7 @@ function SystemHealth() {
       }}>
         <M size={9} color={c.textPri} upper>System Health</M>
         <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-          <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#00CC77', boxShadow: '0 0 6px #00CC77' }} />
+          <div style={{ width: 5, height: 5, borderRadius: '50%', background: '#00CC77' }} />
           <M size={8} color="#00CC77" upper>All Systems OK</M>
         </div>
       </div>
@@ -195,7 +195,6 @@ function RoasBenchmark() {
                   position: 'absolute', left: 0, top: 0, height: '100%',
                   width: `${barPct}%`, borderRadius: 4, background: color,
                   opacity: 0.75,
-                  boxShadow: cp.status !== 'below' ? `0 0 8px ${color}40` : 'none',
                 }} />
                 <div style={{ position: 'absolute', left: `${minPct}%`, top: -3, bottom: -3, width: 1, background: '#FF4466', opacity: 0.5 }} />
                 <div style={{ position: 'absolute', left: `${tgtPct}%`, top: -3, bottom: -3, width: 1, background: '#FFB800', opacity: 0.5 }} />
@@ -222,8 +221,8 @@ function LiveStats() {
       <div>
         <M size={8} color={c.textSec} upper style={{ display: 'block', marginBottom: 10 }}>Account Status</M>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          <div style={{ width: 6, height: 6, borderRadius: '50%', background: c.accent, boxShadow: `0 0 8px ${c.accent}` }} />
-          <M size={15} color={c.accent} style={{ textShadow: `0 0 12px rgba(0,177,162,0.4)` }}>Active</M>
+          <div style={{ width: 6, height: 6, borderRadius: '50%', background: c.accent }} />
+          <M size={15} color={c.accent}>Active</M>
         </div>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -328,7 +327,7 @@ function WaveformSection() {
           ))}
           <path d={areaPath} fill="url(#roasGrad)" />
           <polyline points={ctrPts} fill="none" stroke="#3B82F6" strokeWidth={1.2} strokeLinejoin="round" opacity={0.6} strokeDasharray="4,2" />
-          <polyline points={roasPts} fill="none" stroke={c.accent} strokeWidth={1.8} strokeLinejoin="round" opacity={0.92} style={{ filter: `drop-shadow(0 0 3px rgba(0,177,162,0.5))` }} />
+          <polyline points={roasPts} fill="none" stroke={c.accent} strokeWidth={1.8} strokeLinejoin="round" opacity={0.92} />
           {[6, 11, 17, 21].map(h => (
             <circle key={h} cx={xOf(h)} cy={yRoas(roas[h])} r={2.5} fill={c.bgCard} stroke={c.accent} strokeWidth={1.5} />
           ))}
@@ -408,7 +407,7 @@ function GlobeViz() {
         {dots.map((d, i) => <circle key={i} cx={d.cx} cy={d.cy} r={1} fill={c.accent} opacity={d.opacity} />)}
         {hotNodes.map((n, i) => (
           <g key={i}>
-            <circle cx={n.cx} cy={n.cy} r={3.5} fill={c.accent} opacity={0.95} style={{ filter: `drop-shadow(0 0 5px ${c.accent})` }} />
+            <circle cx={n.cx} cy={n.cy} r={3.5} fill={c.accent} opacity={0.95} />
             <circle cx={n.cx} cy={n.cy} r={7} fill="none" stroke={c.accent} strokeWidth={0.5} opacity={0.35} />
           </g>
         ))}
@@ -506,8 +505,7 @@ const miniWaveform = (() => {
       </defs>
       <path d={area} fill="url(#mwGrad)" />
       <polyline points={cPts} fill="none" stroke="#3B82F6" strokeWidth="1.2" strokeLinejoin="round" opacity={0.55} strokeDasharray="3,2" />
-      <polyline points={rPts} fill="none" stroke={c.accent} strokeWidth="1.8" strokeLinejoin="round" opacity={0.92}
-        style={{ filter: `drop-shadow(0 0 3px rgba(0,177,162,0.5))` }} />
+      <polyline points={rPts} fill="none" stroke={c.accent} strokeWidth="1.8" strokeLinejoin="round" opacity={0.92} />
     </svg>
   );
 })();
@@ -524,8 +522,7 @@ const miniGlobe = (() => {
           return <ellipse key={lat} cx={cx} cy={yPos} rx={R * 0.85} ry={ry} fill="none" stroke={c.border} strokeWidth={0.5} opacity={0.5} />;
         })}
         {[{x:28,y:32},{x:48,y:24},{x:52,y:44},{x:34,y:50},{x:42,y:38}].map((pt, i) => (
-          <circle key={i} cx={pt.x} cy={pt.y} r={2.5} fill={c.accent} opacity={0.9}
-            style={{ filter: `drop-shadow(0 0 3px ${c.accent})` }} />
+          <circle key={i} cx={pt.x} cy={pt.y} r={2.5} fill={c.accent} opacity={0.9} />
         ))}
       </svg>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>

@@ -100,7 +100,6 @@ function Sidebar({ page, onNav }: { page: PageId; onNav: (p: PageId) => void }) 
                 <div style={{
                   position: 'absolute', top: 1, right: 1, width: 7, height: 7,
                   borderRadius: '50%', background: '#2CCDC2', zIndex: 1,
-                  boxShadow: '0 0 6px #2CCDC2',
                 }} />
               )}
               <button
@@ -156,8 +155,12 @@ function TopBar({ onOpenUserCenter, isDark, onToggleDark }: {
       padding: '0 28px', borderBottom: `1px solid ${c.border}`,
       background: c.bgPanel, flexShrink: 0,
     }}>
-      <img src="/lanbow-logo.png" alt="LANBOW"
-        style={{ height: 20, width: 'auto', marginRight: 16, opacity: 0.9, display: 'block' }} />
+      <span style={{
+        fontFamily: 'Georgia,"Times New Roman",serif',
+        fontSize: 17, fontWeight: 900, letterSpacing: '0.04em',
+        color: c.textPri, lineHeight: 1, marginRight: 16,
+        userSelect: 'none',
+      }}>LANBOW</span>
       <span style={{ fontFamily: c.mono, fontSize: 11, color: c.textSec, letterSpacing: '0.06em' }}>
         Enterprise Growth Decision System . V1
       </span>

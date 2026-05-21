@@ -131,7 +131,6 @@ function TypingIndicator() {
           <div key={i} style={{
             width: 4, height: 4, borderRadius: '50%', background: c.accent,
             opacity: frame === i ? 1 : 0.18, transition: 'opacity 0.2s',
-            boxShadow: frame === i ? `0 0 6px ${c.accent}` : 'none',
           }} />
         ))}
       </div>
@@ -558,8 +557,7 @@ function MiniWave({ phase, amp = 1, color = c.accent }: { phase: number; amp?: n
   return (
     <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} style={{ display: 'block', flexShrink: 0 }}>
       <polyline points={pts.join(' ')} fill="none" stroke={color}
-        strokeWidth="1.5" strokeLinejoin="round" opacity={0.85}
-        style={{ filter: `drop-shadow(0 0 3px ${color})` }} />
+        strokeWidth="1.5" strokeLinejoin="round" opacity={0.85} />
     </svg>
   );
 }
@@ -611,7 +609,7 @@ function SignalAssetTesting() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
               <M size={8} color={sc.color}>{a.score}%</M>
               <div style={{ height: 3, background: c.bgBase, borderRadius: 2, overflow: 'hidden' }}>
-                <div style={{ width: `${a.score}%`, height: '100%', borderRadius: 2, background: sc.color, boxShadow: a.status === 'match' ? `0 0 6px ${sc.color}` : 'none' }} />
+                <div style={{ width: `${a.score}%`, height: '100%', borderRadius: 2, background: sc.color }} />
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -940,11 +938,11 @@ function ExportReportReply() {
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
         {kpis.map(k => (
           <div key={k.label} style={{
-            background: 'rgba(0,0,0,0.25)', border: `1px solid ${k.color}55`,
-            borderRadius: 8, padding: '10px 12px', boxShadow: `0 0 16px ${k.color}08 inset`,
+            background: c.bgCard, border: `1px solid ${c.border}`,
+            borderRadius: 8, padding: '10px 12px',
           }}>
             <M size={8} color={c.textMute} upper style={{ display: 'block', marginBottom: 6, letterSpacing: '0.1em' }}>{k.label}</M>
-            <div style={{ fontFamily: c.mono, fontSize: 28, fontWeight: 200, color: k.color, lineHeight: 1, marginBottom: 6, letterSpacing: '-0.02em', textShadow: `0 0 16px ${k.color}50` }}>{k.value}</div>
+            <div style={{ fontFamily: c.mono, fontSize: 28, fontWeight: 200, color: k.color, lineHeight: 1, marginBottom: 6, letterSpacing: '-0.02em' }}>{k.value}</div>
             <M size={9} color={c.textMute} style={{ display: 'block', lineHeight: 1.5 }}>{k.sub}</M>
           </div>
         ))}
@@ -967,7 +965,6 @@ function ExportReportReply() {
                     ? 'linear-gradient(90deg,rgba(255,68,102,0.55),rgba(255,68,102,0.9))'
                     : 'linear-gradient(90deg,rgba(0,177,162,0.4),rgba(0,177,162,0.8))',
                   borderRadius: 3,
-                  boxShadow: row.crit ? '0 0 6px rgba(255,68,102,0.4)' : '0 0 5px rgba(0,177,162,0.25)',
                 }} />
               </div>
               <M size={10} color={row.crit ? '#FF4466' : c.textPri} bold style={{ textAlign: 'right' }}>{row.n.toLocaleString()}</M>
@@ -1697,7 +1694,6 @@ function AnimatedInputBar({ value, onChange, onFocus, onBlur, focused, onSend }:
           borderRadius: 6, color: canSend ? c.bgBase : c.textMute,
           cursor: canSend ? 'pointer' : 'default',
           transition: 'all 0.16s', textTransform: 'uppercase', letterSpacing: '0.08em', flexShrink: 0,
-          boxShadow: canSend ? `0 0 14px ${c.accentGlow}` : 'none',
           transform: hovBtn === 'send' && canSend ? 'translateY(-1px)' : 'translateY(0)',
         }}>Send</button>
     </div>
@@ -1761,9 +1757,9 @@ function HistoryPanel({
   return (
     <div style={{
       position: 'absolute', left: 0, top: 0, bottom: 0, zIndex: 10,
-      width: 220, background: '#0d1e2a',
-      borderRight: `1px solid rgba(0,177,162,0.22)`,
-      boxShadow: '4px 0 24px rgba(0,0,0,0.55)',
+      width: 220, background: c.bgPanel,
+      borderRight: `1px solid ${c.borderStrong}`,
+      boxShadow: `4px 0 24px var(--c-shadow-color)`,
       display: 'flex', flexDirection: 'column',
       animation: 'historySlideIn 0.22s cubic-bezier(.2,0,.2,1) both',
     }}>
@@ -1793,8 +1789,8 @@ function HistoryPanel({
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
           transition: 'background 0.15s, box-shadow 0.15s',
         }}
-          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,177,162,0.14)'; (e.currentTarget as HTMLButtonElement).style.boxShadow = `0 0 14px rgba(0,177,162,0.2)`; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,177,162,0.07)'; (e.currentTarget as HTMLButtonElement).style.boxShadow = 'none'; }}
+          onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,177,162,0.14)'; }}
+          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,177,162,0.07)'; }}
         >
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
             <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
@@ -1826,7 +1822,7 @@ function HistoryPanel({
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
                 <div style={{
                   width: 6, height: 6, borderRadius: '50%', flexShrink: 0, marginTop: 4,
-                  background: c.accentDim, boxShadow: `0 0 5px ${c.accentDim}`,
+                  background: c.accentDim,
                 }} />
                 <div style={{ minWidth: 0 }}>
                   <M size={10} color={c.textSec} style={{ display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -1960,7 +1956,8 @@ export function CommChatContent({ msgs, typing, onAuthorize }: { msgs: ChatMsg[]
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         padding: '9px 16px', borderBottom: `1px solid ${c.border}`,
-        background: 'rgba(0,0,0,0.06)', flexShrink: 0,
+        background: c.bgFrost, backdropFilter: 'blur(14px)',
+        WebkitBackdropFilter: 'blur(14px)', flexShrink: 0,
       }}>
         {/* History toggle */}
         <button
@@ -2157,11 +2154,9 @@ export function CommChatContent({ msgs, typing, onAuthorize }: { msgs: ChatMsg[]
                     textTransform: 'uppercase',
                     background: c.accent, color: c.bgBase, border: 'none',
                     borderRadius: 6, padding: '9px 20px', cursor: 'pointer',
-                    boxShadow: `0 0 18px rgba(0,177,162,0.35)`,
-                    transition: 'box-shadow 0.15s',
                   }}
-                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 0 28px rgba(0,177,162,0.55)'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 0 18px rgba(0,177,162,0.35)'; }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,177,162,0.9)'; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = c.accent; }}
                 >
                   Authorize All
                 </button>
@@ -2375,8 +2370,9 @@ export function CommChatContent({ msgs, typing, onAuthorize }: { msgs: ChatMsg[]
         flexShrink: 0,
         padding: '10px 24px 20px',
         borderTop: `1px solid ${c.border}`,
-        background: 'rgba(0,0,0,0.08)',
-        backdropFilter: 'blur(8px)',
+        background: c.bgFrost,
+        backdropFilter: 'blur(14px)',
+        WebkitBackdropFilter: 'blur(14px)',
       }}>
         {(showPreset || showSetup || localMsgs.length > 0 || msgs.length > 0) && (
           <QuickSuggestions onSelect={handleChipSelect} usedChips={usedChips} />
