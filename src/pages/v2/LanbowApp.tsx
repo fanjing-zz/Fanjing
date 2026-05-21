@@ -158,7 +158,7 @@ function TopBar({ onOpenUserCenter, isDark, onToggleDark }: {
       <img
         src={isDark ? '/lanbow-logo-light.png' : '/lanbow-logo-dark.png'}
         alt="LANBOW"
-        style={{ height: 20, width: 'auto', marginRight: 16, display: 'block' }}
+        style={{ height: 15, width: 'auto', marginRight: 16, marginLeft: -6, display: 'block' }}
       />
       <span style={{ fontFamily: c.mono, fontSize: 11, color: c.textSec, letterSpacing: '0.06em' }}>
         Enterprise Growth Decision System . V1
