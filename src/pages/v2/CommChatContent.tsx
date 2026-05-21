@@ -169,8 +169,39 @@ function ProjectPicker({ onSelect }: { onSelect: (p: Project) => void }) {
   );
 }
 
+// ── Per-project campaign mock data ────────────────────────────────────────────
+const PROJECT_CAMPAIGNS: Record<string, Array<{ name: string; roas: number; spend: number; budget: number; impr: string; clicks: number; status: ProjectStatus }>> = {
+  'PRJ-001': [
+    { name: 'Romance_Q2_Prospecting',  roas: 5.2, spend: 840,  budget: 24, impr: '320K', clicks: 1240, status: 'active' },
+    { name: 'Romance_Q2_Retarget_A',   roas: 4.1, spend: 620,  budget: 18, impr: '180K', clicks: 820,  status: 'active' },
+    { name: 'BeyondHorizon_Scale',     roas: 3.2, spend: 420,  budget: 14, impr: '140K', clicks: 580,  status: 'paused' },
+    { name: 'Romance_Q2_Retarget_B',   roas: 4.8, spend: 180,  budget: 10, impr: '98K',  clicks: 380,  status: 'active' },
+    { name: 'Romance_Q2_LAL',          roas: 4.5, spend: 120,  budget: 8,  impr: '62K',  clicks: 220,  status: 'active' },
+  ],
+  'PRJ-002': [
+    { name: 'Horizon_US_Prospecting',  roas: 3.4, spend: 340,  budget: 16, impr: '210K', clicks: 680,  status: 'paused' },
+    { name: 'Horizon_US_Retarget',     roas: 2.8, spend: 300,  budget: 12, impr: '160K', clicks: 420,  status: 'paused' },
+  ],
+  'PRJ-003': [
+    { name: 'Summer_Meta_Awareness',   roas: 0,   spend: 0,    budget: 40, impr: '—',    clicks: 0,    status: 'draft' },
+    { name: 'Summer_TK_TopView',       roas: 0,   spend: 0,    budget: 50, impr: '—',    clicks: 0,    status: 'draft' },
+    { name: 'Summer_Meta_Retarget',    roas: 0,   spend: 0,    budget: 30, impr: '—',    clicks: 0,    status: 'draft' },
+  ],
+  'PRJ-004': [
+    { name: 'Lexi_Spring_Prospecting', roas: 6.4, spend: 2800, budget: 20, impr: '1.1M', clicks: 4200, status: 'completed' },
+    { name: 'Lexi_Spring_Retarget_A',  roas: 6.8, spend: 2100, budget: 15, impr: '820K', clicks: 3100, status: 'completed' },
+    { name: 'Lexi_Spring_Retarget_B',  roas: 5.9, spend: 1900, budget: 12, impr: '780K', clicks: 2800, status: 'completed' },
+    { name: 'Lexi_Spring_LAL',         roas: 5.4, spend: 1630, budget: 8,  impr: '640K', clicks: 2100, status: 'completed' },
+  ],
+  'PRJ-005': [
+    { name: 'Evergreen_Retarget_Core', roas: 5.8, spend: 1960, budget: 50, impr: '680K', clicks: 2800, status: 'active' },
+    { name: 'Evergreen_LAL_Expand',    roas: 4.7, spend: 1080, budget: 24, impr: '420K', clicks: 1600, status: 'active' },
+    { name: 'Evergreen_Prospecting',   roas: 4.9, spend: 720,  budget: 16, impr: '310K', clicks: 1100, status: 'active' },
+  ],
+};
+
 // ── ProjectDetail ─────────────────────────────────────────────────────────────
-function ProjectDetail({ projectId }: { projectId: string }) {
+function ProjectDetail({ projectId, onAction }: { projectId: string; onAction?: (action: 'report' | 'budget' | 'social', projectId: string) => void }) {
   const p = PROJECTS.find(x => x.id === projectId);
   if (!p) return null;
   const st = PROJECT_STATUS_STYLE[p.status];
@@ -267,8 +298,12 @@ function ProjectDetail({ projectId }: { projectId: string }) {
 
       {/* Actions */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        {['查看完整报告', '调整预算', '管理授权账号'].map(label => (
-          <button key={label} style={{
+        {([
+          { label: '查看完整报告', action: 'report' as const },
+          { label: '调整预算',     action: 'budget' as const },
+          { label: '管理授权账号', action: 'social' as const },
+        ]).map(({ label, action }) => (
+          <button key={label} onClick={() => onAction?.(action, p.id)} style={{
             fontFamily: c.mono, fontSize: 9, padding: '6px 12px',
             background: 'transparent', border: `1px solid ${c.border}`,
             borderRadius: 5, color: c.textSec, cursor: 'pointer',
@@ -497,6 +532,263 @@ function SocialReauthGuide({ accountId }: { accountId: string }) {
           onMouseEnter={e => { e.currentTarget.style.borderColor = c.borderStrong; e.currentTarget.style.color = c.textPri; }}
           onMouseLeave={e => { e.currentTarget.style.borderColor = c.border; e.currentTarget.style.color = c.textSec; }}
         >稍后处理</button>
+      </div>
+    </div>
+  );
+}
+
+// ── ProjectReport ─────────────────────────────────────────────────────────────
+function ProjectReport({ projectId }: { projectId: string }) {
+  const p = PROJECTS.find(x => x.id === projectId);
+  if (!p) return null;
+  const campaigns = PROJECT_CAMPAIGNS[projectId] ?? [];
+  const [period, setPeriod] = React.useState<'7D' | '30D'>('7D');
+  const roasColor = (r: number) => r >= 4 ? c.green : r >= 3 ? '#FFB800' : '#FF4466';
+  const maxSpend = Math.max(...campaigns.map(c => c.spend), 1);
+  const totalSpend = campaigns.reduce((s, c) => s + c.spend, 0);
+  const totalClicks = campaigns.reduce((s, c) => s + c.clicks, 0);
+  const avgRoas = campaigns.filter(c => c.roas > 0).reduce((s, c, _, a) => s + c.roas / a.length, 0);
+
+  const summaryMetrics = [
+    { k: 'AVG ROAS',   v: avgRoas > 0 ? `${avgRoas.toFixed(1)}×` : '—', color: avgRoas >= 4 ? c.green : '#FFB800' },
+    { k: 'TOTAL SPEND', v: `$${totalSpend.toLocaleString()}`, color: c.textPri },
+    { k: 'CLICKS',      v: totalClicks.toLocaleString(), color: c.textPri },
+    { k: 'AD SETS',     v: String(p.adSets), color: c.textPri },
+    { k: 'CAMPAIGNS',   v: String(p.campaigns), color: c.textPri },
+    { k: 'GEO',         v: p.geo, color: c.textSec },
+  ];
+
+  const recommendations = campaigns.filter(c => c.roas > 0).map(c => {
+    if (c.roas >= 5) return `扩大 ${c.name.split('_').slice(-1)[0]}，ROAS ${c.roas}× 表现强劲`;
+    if (c.roas < 3.5) return `暂停 ${c.name.split('_').slice(-1)[0]}，ROAS ${c.roas}× 低于阈值`;
+    return null;
+  }).filter(Boolean).slice(0, 3);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 14, width: '100%' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div>
+          <M size={11} color={c.textPri} bold style={{ display: 'block' }}>{p.name}</M>
+          <M size={9} color={c.textMute}>完整数据报告</M>
+        </div>
+        <div style={{ display: 'flex', gap: 4 }}>
+          {(['7D', '30D'] as const).map(d => (
+            <button key={d} onClick={() => setPeriod(d)} style={{
+              fontFamily: c.mono, fontSize: 9, padding: '4px 10px',
+              background: period === d ? c.accentDim : 'transparent',
+              border: `1px solid ${period === d ? c.borderStrong : c.border}`,
+              borderRadius: 4, color: period === d ? c.accent : c.textMute,
+              cursor: 'pointer', letterSpacing: '0.07em', transition: 'all 0.14s',
+            }}>{d}</button>
+          ))}
+        </div>
+      </div>
+
+      {/* Summary metrics */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 1, background: c.border, borderRadius: 7, overflow: 'hidden' }}>
+        {summaryMetrics.map(({ k, v, color }) => (
+          <div key={k} style={{ background: c.bgCard, padding: '10px 12px' }}>
+            <M size={8} color={c.textMute} upper style={{ display: 'block', marginBottom: 4 }}>{k}</M>
+            <span style={{ fontFamily: c.mono, fontSize: 14, fontWeight: 300, color, lineHeight: 1 }}>{v}</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Campaign performance table */}
+      <div style={{ background: c.bgCard, border: `1px solid ${c.border}`, borderRadius: 7, overflow: 'hidden' }}>
+        <div style={{ padding: '9px 14px', borderBottom: `1px solid ${c.border}`, display: 'flex', justifyContent: 'space-between' }}>
+          <M size={9} color={c.accent} upper bold>Campaign Performance</M>
+          <M size={9} color={c.textMute}>{period}</M>
+        </div>
+        {campaigns.map((camp, i) => {
+          const barPct = maxSpend > 0 ? (camp.spend / maxSpend) * 100 : 0;
+          const color = roasColor(camp.roas);
+          return (
+            <div key={i} style={{
+              display: 'grid', gridTemplateColumns: '1fr 120px 46px',
+              alignItems: 'center', gap: 12, padding: '9px 14px',
+              borderBottom: i < campaigns.length - 1 ? `1px solid ${c.border}` : 'none',
+              background: i % 2 === 0 ? 'transparent' : c.bgBase,
+            }}>
+              <div style={{ minWidth: 0 }}>
+                <M size={9} color={c.textSec} style={{ display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginBottom: 4 }}>
+                  {camp.name}
+                </M>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <div style={{ flex: 1, height: 4, background: c.border, borderRadius: 2, overflow: 'hidden' }}>
+                    <div style={{ width: `${barPct}%`, height: '100%', background: color, borderRadius: 2, opacity: 0.8 }} />
+                  </div>
+                  <M size={8} color={c.textMute}>${camp.spend.toLocaleString()}</M>
+                </div>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <M size={8} color={c.textMute}>{camp.impr} impr · {camp.clicks.toLocaleString()} clicks</M>
+              </div>
+              <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                {camp.roas > 0
+                  ? <span style={{ fontFamily: c.mono, fontSize: 13, fontWeight: 600, color }}>{camp.roas.toFixed(1)}×</span>
+                  : <M size={9} color={c.textMute}>—</M>
+                }
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Recommendations */}
+      {recommendations.length > 0 && (
+        <div style={{ padding: '10px 13px', background: c.accentDim, border: `1px solid ${c.borderStrong}`, borderRadius: 7, borderLeft: `3px solid ${c.accent}` }}>
+          <M size={8} color={c.accent} upper bold style={{ display: 'block', marginBottom: 7 }}>AI 优化建议</M>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+            {recommendations.map((r, i) => (
+              <div key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                <M size={9} color={c.accent} style={{ flexShrink: 0 }}>→</M>
+                <M size={10} color={c.textSec} style={{ lineHeight: 1.65 }}>{r}</M>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── BudgetAdjust ──────────────────────────────────────────────────────────────
+function BudgetAdjust({ projectId }: { projectId: string }) {
+  const p = PROJECTS.find(x => x.id === projectId);
+  if (!p) return null;
+  const baseCampaigns = PROJECT_CAMPAIGNS[projectId] ?? [];
+  const [budgets, setBudgets] = React.useState<number[]>(baseCampaigns.map(c => c.budget));
+  const [confirmed, setConfirmed] = React.useState(false);
+
+  const originalTotal = baseCampaigns.reduce((s, c) => s + c.budget, 0);
+  const newTotal = budgets.reduce((s, v) => s + v, 0);
+  const delta = newTotal - originalTotal;
+  const roasColor = (r: number) => r >= 4 ? c.green : r >= 3 ? '#FFB800' : '#FF4466';
+
+  if (confirmed) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ fontSize: 16 }}>✓</span>
+          <M size={11} color={c.green} bold>预算已更新</M>
+        </div>
+        <M size={10} color={c.textSec} style={{ display: 'block', lineHeight: 1.7 }}>
+          {p.name} 的总预算已调整为 <span style={{ color: c.textPri, fontWeight: 700 }}>${newTotal}/day</span>
+          {delta !== 0 && <span style={{ color: delta > 0 ? c.green : '#FF4466' }}> ({delta > 0 ? '+' : ''}${delta}/day)</span>}
+          。变更将在 15 分钟内同步至 Meta 广告账户。
+        </M>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div>
+          <M size={11} color={c.textPri} bold style={{ display: 'block' }}>调整预算 — {p.name}</M>
+          <M size={9} color={c.textMute}>当前总预算: ${originalTotal}/day</M>
+        </div>
+        {delta !== 0 && (
+          <span style={{ fontFamily: c.mono, fontSize: 11, fontWeight: 700, color: delta > 0 ? c.green : '#FF4466' }}>
+            {delta > 0 ? '+' : ''}${delta}/day
+          </span>
+        )}
+      </div>
+
+      {/* Per-campaign rows */}
+      <div style={{ background: c.bgCard, border: `1px solid ${c.border}`, borderRadius: 7, overflow: 'hidden' }}>
+        {baseCampaigns.map((camp, i) => {
+          const cur = budgets[i];
+          const orig = camp.budget;
+          const changed = cur !== orig;
+          return (
+            <div key={i} style={{
+              display: 'grid', gridTemplateColumns: '1fr auto',
+              alignItems: 'center', gap: 16, padding: '10px 14px',
+              borderBottom: i < baseCampaigns.length - 1 ? `1px solid ${c.border}` : 'none',
+              background: changed ? c.accentDim : 'transparent',
+              transition: 'background 0.2s',
+            }}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 3 }}>
+                  <M size={9} color={c.textSec} style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {camp.name}
+                  </M>
+                  {camp.roas > 0 && (
+                    <span style={{ fontFamily: c.mono, fontSize: 9, color: roasColor(camp.roas), flexShrink: 0 }}>
+                      {camp.roas.toFixed(1)}×
+                    </span>
+                  )}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <M size={8} color={c.textMute}>原: ${orig}/day</M>
+                  {changed && <M size={8} color={c.accent}>→ ${cur}/day</M>}
+                </div>
+              </div>
+              {/* +/- controls */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
+                <button onClick={() => setBudgets(b => b.map((v, j) => j === i ? Math.max(1, v - 2) : v))} style={{
+                  width: 26, height: 26, borderRadius: 4, border: `1px solid ${c.border}`,
+                  background: 'transparent', color: c.textSec, cursor: 'pointer',
+                  fontFamily: c.mono, fontSize: 14, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'all 0.12s',
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = c.borderStrong; e.currentTarget.style.color = c.textPri; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = c.border; e.currentTarget.style.color = c.textSec; }}
+                >−</button>
+                <span style={{ fontFamily: c.mono, fontSize: 11, color: c.textPri, minWidth: 48, textAlign: 'center' }}>
+                  ${cur}/day
+                </span>
+                <button onClick={() => setBudgets(b => b.map((v, j) => j === i ? v + 2 : v))} style={{
+                  width: 26, height: 26, borderRadius: 4, border: `1px solid ${c.border}`,
+                  background: 'transparent', color: c.textSec, cursor: 'pointer',
+                  fontFamily: c.mono, fontSize: 14, lineHeight: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'all 0.12s',
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = c.borderStrong; e.currentTarget.style.color = c.textPri; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = c.border; e.currentTarget.style.color = c.textSec; }}
+                >+</button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Total + confirm */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 14px', background: c.bgCard, border: `1px solid ${c.border}`, borderRadius: 7 }}>
+        <div>
+          <M size={8} color={c.textMute} upper style={{ display: 'block', marginBottom: 3 }}>新总预算</M>
+          <span style={{ fontFamily: c.mono, fontSize: 16, fontWeight: 600, color: c.textPri }}>
+            ${newTotal}/day
+          </span>
+          {delta !== 0 && (
+            <span style={{ fontFamily: c.mono, fontSize: 10, color: delta > 0 ? c.green : '#FF4466', marginLeft: 8 }}>
+              {delta > 0 ? '+' : ''}${delta}
+            </span>
+          )}
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button onClick={() => setBudgets(baseCampaigns.map(c => c.budget))} style={{
+            fontFamily: c.mono, fontSize: 9, padding: '6px 12px',
+            background: 'transparent', border: `1px solid ${c.border}`,
+            borderRadius: 5, color: c.textMute, cursor: 'pointer', letterSpacing: '0.06em',
+            transition: 'all 0.14s',
+          }}
+            onMouseEnter={e => { e.currentTarget.style.color = c.textSec; }}
+            onMouseLeave={e => { e.currentTarget.style.color = c.textMute; }}
+          >重置</button>
+          <button onClick={() => delta !== 0 && setConfirmed(true)} style={{
+            fontFamily: c.mono, fontSize: 9, padding: '6px 14px',
+            background: delta !== 0 ? c.accent : c.border,
+            border: 'none', borderRadius: 5,
+            color: delta !== 0 ? c.bgBase : c.textMute,
+            cursor: delta !== 0 ? 'pointer' : 'default',
+            letterSpacing: '0.06em', transition: 'all 0.14s',
+          }}>确认调整</button>
+        </div>
       </div>
     </div>
   );
@@ -2359,7 +2651,7 @@ export function CommChatContent({ msgs, typing, onAuthorize }: { msgs: ChatMsg[]
   const bottomRef = useRef<HTMLDivElement>(null);
   const [inputVal, setInputVal] = React.useState('');
   const [inputFocused, setInputFocused] = React.useState(false);
-  const [localMsgs, setLocalMsgs] = React.useState<{ id: string; role: 'user' | 'agent'; text?: string; chipKey?: string; msgType?: 'project-picker' | 'project-detail' | 'social-auth' | 'social-reauth'; projectId?: string; socialAccountId?: string }[]>([]);
+  const [localMsgs, setLocalMsgs] = React.useState<{ id: string; role: 'user' | 'agent'; text?: string; chipKey?: string; msgType?: 'project-picker' | 'project-detail' | 'project-report' | 'budget-adjust' | 'social-auth' | 'social-reauth'; projectId?: string; socialAccountId?: string }[]>([]);
   const [localTyping, setLocalTyping] = React.useState(false);
   const [showPreset, setShowPreset] = React.useState(false);
   const [showSetup, setShowSetup] = React.useState(false);
@@ -2425,6 +2717,20 @@ export function CommChatContent({ msgs, typing, onAuthorize }: { msgs: ChatMsg[]
       setLocalTyping(false);
       setLocalMsgs(p => [...p, { id: id + '_r', role: 'agent', msgType: 'project-detail', projectId: proj.id }]);
     }, 900);
+  }, []);
+
+  const handleProjectAction = React.useCallback((action: 'report' | 'budget' | 'social', projectId: string) => {
+    const id = Date.now().toString();
+    const labels = { report: '查看完整报告', budget: '调整预算', social: '管理授权账号' };
+    setLocalMsgs(p => [...p, { id, role: 'user', text: labels[action] }]);
+    setLocalTyping(true);
+    setTimeout(() => {
+      setLocalTyping(false);
+      const msgType = action === 'report' ? 'project-report' as const
+        : action === 'budget' ? 'budget-adjust' as const
+        : 'social-auth' as const;
+      setLocalMsgs(p => [...p, { id: id + '_r', role: 'agent', msgType, projectId }]);
+    }, 700);
   }, []);
 
   const handleSocialReauth = React.useCallback((sa: SocialAccount) => {
@@ -2889,8 +3195,12 @@ export function CommChatContent({ msgs, typing, onAuthorize }: { msgs: ChatMsg[]
             : msg.msgType === 'project-picker'
               ? <AgentBlock key={msg.id}><ProjectPicker onSelect={handleProjectSelect} /></AgentBlock>
               : msg.msgType === 'project-detail'
-                ? <AgentBlock key={msg.id}><ProjectDetail projectId={msg.projectId!} /></AgentBlock>
-                : msg.msgType === 'social-auth'
+                ? <AgentBlock key={msg.id}><ProjectDetail projectId={msg.projectId!} onAction={handleProjectAction} /></AgentBlock>
+                : msg.msgType === 'project-report'
+                  ? <AgentBlock key={msg.id}><ProjectReport projectId={msg.projectId!} /></AgentBlock>
+                  : msg.msgType === 'budget-adjust'
+                    ? <AgentBlock key={msg.id}><BudgetAdjust projectId={msg.projectId!} /></AgentBlock>
+                    : msg.msgType === 'social-auth'
                   ? <AgentBlock key={msg.id}><SocialAccountManager onReauth={handleSocialReauth} /></AgentBlock>
                   : msg.msgType === 'social-reauth'
                     ? <AgentBlock key={msg.id}><SocialReauthGuide accountId={msg.socialAccountId!} /></AgentBlock>
