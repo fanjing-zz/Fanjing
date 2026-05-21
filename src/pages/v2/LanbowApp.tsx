@@ -155,13 +155,11 @@ function TopBar({ onOpenUserCenter, isDark, onToggleDark }: {
       padding: '0 28px', borderBottom: `1px solid ${c.border}`,
       background: c.bgPanel, flexShrink: 0,
     }}>
-      <span style={{
-        fontFamily: 'Georgia,"Times New Roman",serif',
-        fontSize: 17, fontWeight: 900, letterSpacing: '0.04em',
-        color: isDark ? '#DDE8E6' : '#0D1014',
-        lineHeight: 1, marginRight: 16,
-        userSelect: 'none',
-      }}>LANBOW</span>
+      <img
+        src={isDark ? '/lanbow-logo-light.png' : '/lanbow-logo-dark.png'}
+        alt="LANBOW"
+        style={{ height: 20, width: 'auto', marginRight: 16, display: 'block' }}
+      />
       <span style={{ fontFamily: c.mono, fontSize: 11, color: c.textSec, letterSpacing: '0.06em' }}>
         Enterprise Growth Decision System . V1
       </span>
