@@ -196,7 +196,7 @@ function StatusMix() {
   const circ = +(2 * Math.PI * R).toFixed(2); // ≈ 238.76
   const segments = [
     { label: 'LIVE',    val: 0,  color: c.accent },
-    { label: 'PAUSED',  val: 74, color: '#555' },
+    { label: 'PAUSED',  val: 74, color: c.textMute },
     { label: 'PENDING', val: 0,  color: '#F59E0B' },
     { label: 'FAILED',  val: 0,  color: '#EF4444' },
   ];
@@ -212,9 +212,9 @@ function StatusMix() {
       <div style={{ display: 'flex', gap: 16, alignItems: 'center', flex: 1 }}>
         <svg width={104} height={104} viewBox="0 0 104 104" style={{ flexShrink: 0 }}>
           {/* Track */}
-          <circle cx={CX} cy={CY} r={R} fill="none" stroke="#2a2a2a" strokeWidth={11} />
+          <circle cx={CX} cy={CY} r={R} fill="none" stroke={c.border} strokeWidth={11} />
           {/* Animated fill */}
-          <circle cx={CX} cy={CY} r={R} fill="none" stroke="#555" strokeWidth={11}
+          <circle cx={CX} cy={CY} r={R} fill="none" stroke={c.accent} strokeWidth={11}
             strokeLinecap="butt"
             strokeDasharray={mounted ? `${circ} 0` : `0 ${circ}`}
             style={{
@@ -384,12 +384,12 @@ const miniFunnel = (
 const miniStatusMix = (
   <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
     <svg width={56} height={56} viewBox="0 0 56 56">
-      <circle cx={28} cy={28} r={20} fill="none" stroke="#3a3a3a" strokeWidth={8} />
-      <circle cx={28} cy={28} r={20} fill="none" stroke="#555" strokeWidth={8} />
+      <circle cx={28} cy={28} r={20} fill="none" stroke={c.border} strokeWidth={8} />
+      <circle cx={28} cy={28} r={20} fill="none" stroke={c.accent} strokeWidth={8} />
       <text x={28} y={33} textAnchor="middle" fontFamily={c.mono} fontSize={11} fontWeight={700} fill={c.textSec}>74</text>
     </svg>
     <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-      {[['LIVE', '0', c.accent], ['PAUSED', '74', '#555'], ['PENDING', '0', '#F59E0B'], ['FAILED', '0', '#EF4444']].map(([l, v, col]) => (
+      {[['LIVE', '0', c.accent], ['PAUSED', '74', c.textMute], ['PENDING', '0', '#F59E0B'], ['FAILED', '0', '#EF4444']].map(([l, v, col]) => (
         <div key={l} style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
           <span style={{ width: 6, height: 6, borderRadius: 1, background: col as string, display: 'inline-block' }} />
           <span style={{ fontFamily: c.mono, fontSize: 8, color: c.textMute }}>{l}</span>
