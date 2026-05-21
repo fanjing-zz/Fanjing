@@ -158,7 +158,8 @@ function TopBar({ onOpenUserCenter, isDark, onToggleDark }: {
       <span style={{
         fontFamily: 'Georgia,"Times New Roman",serif',
         fontSize: 17, fontWeight: 900, letterSpacing: '0.04em',
-        color: c.textPri, lineHeight: 1, marginRight: 16,
+        color: isDark ? '#DDE8E6' : '#0D1014',
+        lineHeight: 1, marginRight: 16,
         userSelect: 'none',
       }}>LANBOW</span>
       <span style={{ fontFamily: c.mono, fontSize: 11, color: c.textSec, letterSpacing: '0.06em' }}>
