@@ -10,29 +10,80 @@ interface Project {
   adSets: number; campaigns: number; geo: string;
   updated: string; platform: string[];
   insights: string;
+  socialAccountIds: string[];
 }
 const PROJECTS: Project[] = [
   { id: 'PRJ-001', name: 'Q2 Romance Series', status: 'active',
     budget: '$74/day', roas: 4.8, spend: '$2,180', adSets: 74, campaigns: 5,
     geo: 'US · CA · GB · AU', updated: '2h ago', platform: ['Meta'],
-    insights: 'ROAS above target. "Beyond the Horizon" underperforming at 3.2× — recommend bid review.' },
+    insights: 'ROAS above target. "Beyond the Horizon" underperforming at 3.2× — recommend bid review.',
+    socialAccountIds: ['SA-001'] },
   { id: 'PRJ-002', name: 'Beyond the Horizon', status: 'paused',
     budget: '$28/day', roas: 3.2, spend: '$640', adSets: 18, campaigns: 2,
     geo: 'US', updated: '1d ago', platform: ['Meta'],
-    insights: 'Below 4.0× ROAS floor. Paused pending creative refresh and audience expansion.' },
+    insights: 'Below 4.0× ROAS floor. Paused pending creative refresh and audience expansion.',
+    socialAccountIds: ['SA-002'] },
   { id: 'PRJ-003', name: 'Summer Launch 2025', status: 'draft',
     budget: '$120/day', roas: 0, spend: '—', adSets: 0, campaigns: 3,
     geo: 'US · CA', updated: '3d ago', platform: ['Meta', 'TikTok'],
-    insights: 'Campaign structure complete. Awaiting creative assets and final budget approval.' },
+    insights: 'Campaign structure complete. Awaiting creative assets and final budget approval.',
+    socialAccountIds: ['SA-001', 'SA-003'] },
   { id: 'PRJ-004', name: 'LexiCollection Spring', status: 'completed',
     budget: '$55/day', roas: 6.1, spend: '$8,430', adSets: 42, campaigns: 4,
     geo: 'US · GB · AU', updated: '1w ago', platform: ['Meta'],
-    insights: 'Campaign ended. Final ROAS 6.1× — strongest performer this quarter.' },
+    insights: 'Campaign ended. Final ROAS 6.1× — strongest performer this quarter.',
+    socialAccountIds: ['SA-001'] },
   { id: 'PRJ-005', name: 'Evergreen Core', status: 'active',
     budget: '$90/day', roas: 5.3, spend: '$3,760', adSets: 31, campaigns: 3,
     geo: 'US · CA', updated: '4h ago', platform: ['Meta'],
-    insights: 'Stable retargeting loop. Frequency rising — consider audience refresh in 5–7 days.' },
+    insights: 'Stable retargeting loop. Frequency rising — consider audience refresh in 5–7 days.',
+    socialAccountIds: ['SA-001'] },
 ];
+
+// ── Social account data ───────────────────────────────────────────────────────
+type SocialPlatform = 'meta' | 'tiktok' | 'google';
+type SocialAuthStatus = 'authorized' | 'expired' | 'pending' | 'revoked';
+interface SocialAccount {
+  id: string; platform: SocialPlatform; displayName: string;
+  accountId: string; pageId?: string; pixelId?: string;
+  status: SocialAuthStatus; lastSync: string; linkedProjectIds: string[];
+}
+const SOCIAL_ACCOUNTS: SocialAccount[] = [
+  { id: 'SA-001', platform: 'meta', displayName: 'Sandwichlab Main',
+    accountId: '8048·9042·9093·816', pageId: 'LexiCollection_85', pixelId: '8834·8266·7767·853',
+    status: 'authorized', lastSync: '10m ago', linkedProjectIds: ['PRJ-001', 'PRJ-003', 'PRJ-004', 'PRJ-005'] },
+  { id: 'SA-002', platform: 'meta', displayName: 'Sandwichlab Dev',
+    accountId: '1323·7408·3949·7080', pageId: 'LexiCollection_Dev', pixelId: '8834·8266·7767·854',
+    status: 'expired', lastSync: '3d ago', linkedProjectIds: ['PRJ-002'] },
+  { id: 'SA-003', platform: 'tiktok', displayName: 'Sandwichlab TK',
+    accountId: 'TK-7291·038',
+    status: 'pending', lastSync: '—', linkedProjectIds: ['PRJ-003'] },
+  { id: 'SA-004', platform: 'google', displayName: 'Sandwichlab GAds',
+    accountId: 'GA-482·019·337',
+    status: 'authorized', lastSync: '1h ago', linkedProjectIds: [] },
+];
+
+const PLATFORM_STYLE: Record<SocialPlatform, { label: string; color: string; bg: string }> = {
+  meta:    { label: 'META',    color: '#3B82F6', bg: 'rgba(59,130,246,0.10)' },
+  tiktok:  { label: 'TIKTOK', color: '#E2E2E2', bg: 'rgba(200,200,200,0.10)' },
+  google:  { label: 'GOOGLE', color: '#EA4335', bg: 'rgba(234,67,53,0.10)' },
+};
+const AUTH_STATUS_STYLE: Record<SocialAuthStatus, { label: string; color: string; dot: string }> = {
+  authorized: { label: 'Active',   color: '#00CC77', dot: '●' },
+  expired:    { label: 'Expired',  color: '#FFB800', dot: '⚠' },
+  pending:    { label: 'Pending',  color: '#8AACBC', dot: '○' },
+  revoked:    { label: 'Revoked',  color: '#FF4466', dot: '✕' },
+};
+
+// Keyword detection — social auth queries
+const SOCIAL_AUTH_KEYWORDS = [
+  '授权', '账号', '绑定', '社媒', '社交', '过期', '验证', '重新授权', '账户管理', '平台账号', '解绑',
+  'social', 'meta', 'facebook', 'tiktok', 'google', 'authorize', 'auth', 'account', 'token', 'link account',
+];
+function isSocialAuthQuery(text: string): boolean {
+  const t = text.toLowerCase();
+  return SOCIAL_AUTH_KEYWORDS.filter(kw => t.includes(kw)).length >= 1 && text.length < 80;
+}
 
 const PROJECT_STATUS_STYLE: Record<ProjectStatus, { label: string; color: string; bg: string; border: string }> = {
   active:    { label: 'Active',    color: c.green,    bg: 'rgba(0,204,119,0.10)',    border: 'rgba(0,204,119,0.25)' },
@@ -178,9 +229,45 @@ function ProjectDetail({ projectId }: { projectId: string }) {
         <M size={11} color={c.textSec} style={{ display: 'block', lineHeight: 1.7 }}>{p.insights}</M>
       </div>
 
+      {/* Linked social accounts */}
+      {(() => {
+        const linked = SOCIAL_ACCOUNTS.filter(sa => p.socialAccountIds.includes(sa.id));
+        if (!linked.length) return null;
+        return (
+          <div>
+            <M size={8} color={c.textMute} upper style={{ display: 'block', marginBottom: 6 }}>Linked Accounts</M>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+              {linked.map(sa => {
+                const pl = PLATFORM_STYLE[sa.platform];
+                const st = AUTH_STATUS_STYLE[sa.status];
+                return (
+                  <div key={sa.id} style={{
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    padding: '7px 11px', background: c.bgCard,
+                    border: `1px solid ${c.border}`, borderRadius: 6,
+                  }}>
+                    <span style={{
+                      fontFamily: c.mono, fontSize: 8, padding: '2px 6px',
+                      background: pl.bg, color: pl.color,
+                      border: `1px solid ${pl.color}33`, borderRadius: 3,
+                      letterSpacing: '0.1em', flexShrink: 0,
+                    }}>{pl.label}</span>
+                    <M size={10} color={c.textPri} bold style={{ flex: 1, minWidth: 0 }}>{sa.displayName}</M>
+                    <M size={9} color={c.textMute} style={{ flexShrink: 0 }}>{sa.accountId}</M>
+                    <span style={{ fontFamily: c.mono, fontSize: 9, color: st.color, flexShrink: 0 }}>
+                      {st.dot} {st.label}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Actions */}
-      <div style={{ display: 'flex', gap: 8 }}>
-        {['查看完整报告', '调整预算', '暂停活动'].map(label => (
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        {['查看完整报告', '调整预算', '管理授权账号'].map(label => (
           <button key={label} style={{
             fontFamily: c.mono, fontSize: 9, padding: '6px 12px',
             background: 'transparent', border: `1px solid ${c.border}`,
@@ -191,6 +278,225 @@ function ProjectDetail({ projectId }: { projectId: string }) {
             onMouseLeave={e => { e.currentTarget.style.borderColor = c.border; e.currentTarget.style.color = c.textSec; }}
           >{label}</button>
         ))}
+      </div>
+    </div>
+  );
+}
+
+// ── SocialAccountManager ──────────────────────────────────────────────────────
+function SocialAccountManager({ onReauth }: { onReauth: (sa: SocialAccount) => void }) {
+  const [hov, setHov] = React.useState<string | null>(null);
+  const expiredCount = SOCIAL_ACCOUNTS.filter(a => a.status === 'expired').length;
+  const pendingCount = SOCIAL_ACCOUNTS.filter(a => a.status === 'pending').length;
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div>
+          <M size={11} color={c.textPri} bold style={{ display: 'block' }}>社媒账号授权管理</M>
+          <M size={9} color={c.textMute} style={{ display: 'block', marginTop: 2 }}>
+            {SOCIAL_ACCOUNTS.length} 个账号已绑定
+            {expiredCount > 0 && <span style={{ color: '#FFB800' }}> · {expiredCount} 个已过期</span>}
+            {pendingCount > 0 && <span style={{ color: '#8AACBC' }}> · {pendingCount} 个待授权</span>}
+          </M>
+        </div>
+        <button style={{
+          fontFamily: c.mono, fontSize: 9, padding: '6px 12px',
+          background: c.accentDim, border: `1px solid ${c.borderStrong}`,
+          borderRadius: 5, color: c.accent, cursor: 'pointer', letterSpacing: '0.07em',
+          transition: 'all 0.14s',
+        }}
+          onMouseEnter={e => { e.currentTarget.style.background = c.borderStrong; }}
+          onMouseLeave={e => { e.currentTarget.style.background = c.accentDim; }}
+        >+ 连接新账号</button>
+      </div>
+
+      {/* Account list */}
+      {SOCIAL_ACCOUNTS.map(sa => {
+        const pl = PLATFORM_STYLE[sa.platform];
+        const st = AUTH_STATUS_STYLE[sa.status];
+        const linkedProjects = PROJECTS.filter(p => sa.linkedProjectIds.includes(p.id));
+        const isHov = hov === sa.id;
+        const needsAction = sa.status === 'expired' || sa.status === 'pending';
+
+        return (
+          <div key={sa.id}
+            onMouseEnter={() => setHov(sa.id)}
+            onMouseLeave={() => setHov(null)}
+            style={{
+              background: isHov ? c.bgElevated : c.bgCard,
+              border: `1px solid ${needsAction ? (sa.status === 'expired' ? 'rgba(255,184,0,0.3)' : 'rgba(138,172,188,0.3)') : c.border}`,
+              borderRadius: 8, overflow: 'hidden',
+              transition: 'background 0.14s',
+            }}
+          >
+            {/* Account header row */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '11px 14px' }}>
+              {/* Platform badge */}
+              <span style={{
+                fontFamily: c.mono, fontSize: 8, padding: '3px 8px',
+                background: pl.bg, color: pl.color,
+                border: `1px solid ${pl.color}44`, borderRadius: 3,
+                letterSpacing: '0.1em', flexShrink: 0, fontWeight: 700,
+              }}>{pl.label}</span>
+
+              {/* Name + ID */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <M size={11} color={c.textPri} bold style={{ display: 'block' }}>{sa.displayName}</M>
+                <M size={9} color={c.textMute}>{sa.accountId}</M>
+              </div>
+
+              {/* Status */}
+              <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                <span style={{ fontFamily: c.mono, fontSize: 9, color: st.color }}>
+                  {st.dot} {st.label}
+                </span>
+                <M size={8} color={c.textMute} style={{ display: 'block', marginTop: 2 }}>
+                  Synced {sa.lastSync}
+                </M>
+              </div>
+            </div>
+
+            {/* Details row */}
+            <div style={{
+              padding: '8px 14px', borderTop: `1px solid ${c.border}`,
+              display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap',
+              background: 'transparent',
+            }}>
+              {/* Sub-account info */}
+              <div style={{ flex: 1, display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                {sa.pageId && (
+                  <div>
+                    <M size={8} color={c.textMute} upper style={{ display: 'block' }}>Page</M>
+                    <M size={9} color={c.textSec}>{sa.pageId}</M>
+                  </div>
+                )}
+                {sa.pixelId && (
+                  <div>
+                    <M size={8} color={c.textMute} upper style={{ display: 'block' }}>Pixel</M>
+                    <M size={9} color={c.textSec}>{sa.pixelId}</M>
+                  </div>
+                )}
+                {/* Linked projects */}
+                <div>
+                  <M size={8} color={c.textMute} upper style={{ display: 'block', marginBottom: 4 }}>关联项目</M>
+                  {linkedProjects.length > 0 ? (
+                    <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+                      {linkedProjects.map(p => (
+                        <span key={p.id} style={{
+                          fontFamily: c.mono, fontSize: 8, padding: '2px 7px',
+                          background: c.accentDim, color: c.accent,
+                          border: `1px solid ${c.borderStrong}`, borderRadius: 3,
+                          letterSpacing: '0.06em',
+                        }}>{p.name}</span>
+                      ))}
+                    </div>
+                  ) : (
+                    <M size={9} color={c.textMute}>暂无关联项目</M>
+                  )}
+                </div>
+              </div>
+
+              {/* Action button */}
+              <div style={{ flexShrink: 0 }}>
+                {sa.status === 'expired' && (
+                  <button onClick={() => onReauth(sa)} style={{
+                    fontFamily: c.mono, fontSize: 9, padding: '5px 12px',
+                    background: 'rgba(255,184,0,0.10)', border: '1px solid rgba(255,184,0,0.35)',
+                    borderRadius: 5, color: '#FFB800', cursor: 'pointer', letterSpacing: '0.07em',
+                    transition: 'all 0.14s',
+                  }}
+                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,184,0,0.20)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,184,0,0.10)'; }}
+                  >重新授权</button>
+                )}
+                {sa.status === 'pending' && (
+                  <button onClick={() => onReauth(sa)} style={{
+                    fontFamily: c.mono, fontSize: 9, padding: '5px 12px',
+                    background: 'rgba(59,130,246,0.10)', border: '1px solid rgba(59,130,246,0.30)',
+                    borderRadius: 5, color: '#3B82F6', cursor: 'pointer', letterSpacing: '0.07em',
+                    transition: 'all 0.14s',
+                  }}
+                    onMouseEnter={e => { e.currentTarget.style.background = 'rgba(59,130,246,0.20)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'rgba(59,130,246,0.10)'; }}
+                  >完成授权</button>
+                )}
+                {sa.status === 'authorized' && (
+                  <button style={{
+                    fontFamily: c.mono, fontSize: 9, padding: '5px 12px',
+                    background: 'transparent', border: `1px solid ${c.border}`,
+                    borderRadius: 5, color: c.textSec, cursor: 'pointer', letterSpacing: '0.07em',
+                    transition: 'all 0.14s',
+                  }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = c.borderStrong; e.currentTarget.style.color = c.textPri; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = c.border; e.currentTarget.style.color = c.textSec; }}
+                  >管理权限</button>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── SocialReauthGuide ─────────────────────────────────────────────────────────
+function SocialReauthGuide({ accountId }: { accountId: string }) {
+  const sa = SOCIAL_ACCOUNTS.find(a => a.id === accountId);
+  if (!sa) return null;
+  const pl = PLATFORM_STYLE[sa.platform];
+  const steps = sa.platform === 'meta'
+    ? ['前往 Meta Business Manager', '进入 "系统用户" → 选择对应账号', '重新生成访问令牌并复制', '在 Lanbow 工作空间粘贴新 Token', '完成验证 — 自动同步恢复']
+    : sa.platform === 'tiktok'
+    ? ['前往 TikTok for Business', '进入 "账号设置" → "授权管理"', '点击 "重新授权 Lanbow"', '确认权限范围后点击同意', '返回 Lanbow 等待同步完成']
+    : ['前往 Google Ads 管理后台', '进入 "工具与设置" → "API 访问"', '重新生成 OAuth 凭据', '在 Lanbow 工作空间粘贴凭据', '完成验证'];
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <span style={{
+          fontFamily: c.mono, fontSize: 8, padding: '3px 8px',
+          background: pl.bg, color: pl.color, border: `1px solid ${pl.color}44`,
+          borderRadius: 3, letterSpacing: '0.1em', fontWeight: 700,
+        }}>{pl.label}</span>
+        <M size={11} color={c.textPri} bold>{sa.displayName} — 重新授权</M>
+      </div>
+      <M size={11} color={c.textSec} style={{ display: 'block', lineHeight: 1.7 }}>
+        该账号的访问令牌已过期，需重新完成授权流程。请按以下步骤操作：
+      </M>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {steps.map((step, i) => (
+          <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start' }}>
+            <span style={{
+              fontFamily: c.mono, fontSize: 9, color: c.accent,
+              background: c.accentDim, border: `1px solid ${c.borderStrong}`,
+              borderRadius: 3, padding: '1px 6px', flexShrink: 0, lineHeight: 1.8,
+            }}>{String(i + 1).padStart(2, '0')}</span>
+            <M size={11} color={c.textSec} style={{ lineHeight: 1.7 }}>{step}</M>
+          </div>
+        ))}
+      </div>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <button style={{
+          fontFamily: c.mono, fontSize: 9, padding: '7px 16px',
+          background: c.accent, border: 'none', borderRadius: 5,
+          color: c.bgBase, cursor: 'pointer', letterSpacing: '0.07em',
+          transition: 'opacity 0.14s',
+        }}
+          onMouseEnter={e => { e.currentTarget.style.opacity = '0.85'; }}
+          onMouseLeave={e => { e.currentTarget.style.opacity = '1'; }}
+        >粘贴 Token 完成授权</button>
+        <button style={{
+          fontFamily: c.mono, fontSize: 9, padding: '7px 14px',
+          background: 'transparent', border: `1px solid ${c.border}`,
+          borderRadius: 5, color: c.textSec, cursor: 'pointer', letterSpacing: '0.07em',
+          transition: 'all 0.14s',
+        }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = c.borderStrong; e.currentTarget.style.color = c.textPri; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = c.border; e.currentTarget.style.color = c.textSec; }}
+        >稍后处理</button>
       </div>
     </div>
   );
@@ -2053,7 +2359,7 @@ export function CommChatContent({ msgs, typing, onAuthorize }: { msgs: ChatMsg[]
   const bottomRef = useRef<HTMLDivElement>(null);
   const [inputVal, setInputVal] = React.useState('');
   const [inputFocused, setInputFocused] = React.useState(false);
-  const [localMsgs, setLocalMsgs] = React.useState<{ id: string; role: 'user' | 'agent'; text?: string; chipKey?: string; msgType?: 'project-picker' | 'project-detail'; projectId?: string }[]>([]);
+  const [localMsgs, setLocalMsgs] = React.useState<{ id: string; role: 'user' | 'agent'; text?: string; chipKey?: string; msgType?: 'project-picker' | 'project-detail' | 'social-auth' | 'social-reauth'; projectId?: string; socialAccountId?: string }[]>([]);
   const [localTyping, setLocalTyping] = React.useState(false);
   const [showPreset, setShowPreset] = React.useState(false);
   const [showSetup, setShowSetup] = React.useState(false);
@@ -2121,14 +2427,28 @@ export function CommChatContent({ msgs, typing, onAuthorize }: { msgs: ChatMsg[]
     }, 900);
   }, []);
 
+  const handleSocialReauth = React.useCallback((sa: SocialAccount) => {
+    const id = Date.now().toString();
+    setLocalMsgs(p => [...p, { id, role: 'user', text: `重新授权 ${sa.displayName}` }]);
+    setLocalTyping(true);
+    setTimeout(() => {
+      setLocalTyping(false);
+      setLocalMsgs(p => [...p, { id: id + '_r', role: 'agent', msgType: 'social-reauth', socialAccountId: sa.id }]);
+    }, 800);
+  }, []);
+
   const sendMessage = (text: string) => {
     if (!text.trim()) return;
     const id = Date.now().toString();
     setLocalMsgs(p => [...p, { id, role: 'user', text }]);
     setInputVal('');
     setLocalTyping(true);
-    if (isProjectQuery(text)) {
-      // Vague project query → show project picker
+    if (isSocialAuthQuery(text)) {
+      setTimeout(() => {
+        setLocalTyping(false);
+        setLocalMsgs(p => [...p, { id: id + '_r', role: 'agent', msgType: 'social-auth' }]);
+      }, 900);
+    } else if (isProjectQuery(text)) {
       setTimeout(() => {
         setLocalTyping(false);
         setLocalMsgs(p => [...p, { id: id + '_r', role: 'agent', msgType: 'project-picker' }]);
@@ -2570,9 +2890,13 @@ export function CommChatContent({ msgs, typing, onAuthorize }: { msgs: ChatMsg[]
               ? <AgentBlock key={msg.id}><ProjectPicker onSelect={handleProjectSelect} /></AgentBlock>
               : msg.msgType === 'project-detail'
                 ? <AgentBlock key={msg.id}><ProjectDetail projectId={msg.projectId!} /></AgentBlock>
-                : msg.chipKey
-                  ? <AgentBlock key={msg.id}>{CHIP_REPLIES[msg.chipKey]?.()}</AgentBlock>
-                  : <LocalAgentMsg key={msg.id} text={msg.text ?? ''} />
+                : msg.msgType === 'social-auth'
+                  ? <AgentBlock key={msg.id}><SocialAccountManager onReauth={handleSocialReauth} /></AgentBlock>
+                  : msg.msgType === 'social-reauth'
+                    ? <AgentBlock key={msg.id}><SocialReauthGuide accountId={msg.socialAccountId!} /></AgentBlock>
+                    : msg.chipKey
+                      ? <AgentBlock key={msg.id}>{CHIP_REPLIES[msg.chipKey]?.()}</AgentBlock>
+                      : <LocalAgentMsg key={msg.id} text={msg.text ?? ''} />
         )}
         {localTyping && <TypingIndicator />}
 
