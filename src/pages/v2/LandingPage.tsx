@@ -27,10 +27,6 @@ const KEYFRAMES = `
     from { top: -1px; }
     to   { top: 100%; }
   }
-  @keyframes lp_ringBreath {
-    0%, 100% { opacity: 0.045; }
-    50%      { opacity: 0.075; }
-  }
 `;
 
 // ── Particle grid ─────────────────────────────────────────────────────────────
@@ -197,23 +193,6 @@ export function LandingPage({ onEnter }: { onEnter: () => void }) {
         opacity: 0, transition: 'opacity 0.5s ease',
       }} />
 
-      {/* ── Two faint concentric rings — purely decorative ── */}
-      {ready && (
-        <>
-          <div style={{
-            position: 'absolute', zIndex: 1, pointerEvents: 'none',
-            width: 560, height: 560, borderRadius: '50%',
-            border: '1px solid rgba(0,177,162,0.06)',
-            animation: 'lp_fadeIn 1.8s ease both, lp_ringBreath 6s ease-in-out 2s infinite',
-          }} />
-          <div style={{
-            position: 'absolute', zIndex: 1, pointerEvents: 'none',
-            width: 380, height: 380, borderRadius: '50%',
-            border: '1px solid rgba(0,177,162,0.08)',
-            animation: 'lp_fadeIn 1.4s ease both, lp_ringBreath 6s ease-in-out 2.8s infinite',
-          }} />
-        </>
-      )}
 
       {/* ── Scan-line ── */}
       {showScan && <ScanLine />}
