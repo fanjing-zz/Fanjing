@@ -1919,18 +1919,11 @@ function buildReportHTML(theme: 'dark' | 'light' = 'dark'): string {
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0;background:var(--bg-base);color:var(--text-pri);font-family:var(--sans);font-size:14px;line-height:1.6}
-  body{
-    background-image:
-      linear-gradient(${vars.gridColor} 1px, transparent 1px),
-      linear-gradient(90deg, ${vars.gridColor} 1px, transparent 1px);
-    background-size: 32px 32px;
-    background-position: center top;
-  }
   /* ── Layout ── */
   .wrap{ max-width: 960px; margin: 0 auto; padding: 52px 44px 80px }
   /* ── Header ── */
   .hdr{ display:flex; justify-content:space-between; align-items:flex-end; padding-bottom:32px; border-bottom:2px solid var(--border-strong); margin-bottom:52px; gap: 24px }
-  .hdr .title{ font-weight:800; font-size:38px; letter-spacing:0.01em; line-height:1.1; background: linear-gradient(180deg, #E8F4F0 0%, var(--text-pri) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent }
+  .hdr .title{ font-weight:800; font-size:38px; letter-spacing:0.01em; line-height:1.1; color: var(--text-pri) }
   .hdr .sub{ font-family: var(--mono); font-size: 12px; color: var(--text-sec); margin-top:10px; line-height:1.6 }
   .hdr .strap{ font-family: var(--mono); font-size: 11px; color: var(--text-mute); margin-top:7px; max-width:600px; line-height:1.7 }
   .hdr .badges{ display:flex; gap:7px; flex-wrap:wrap; align-items:center; margin-top:18px }
@@ -1989,14 +1982,14 @@ function buildReportHTML(theme: 'dark' | 'light' = 'dark'): string {
   .country-list .bar{ height: 100%; background: var(--accent); opacity: 0.75; border-radius: 4px }
   .country-list .min{ font-family: var(--mono); font-size: 11px; color: var(--text-sec); text-align: right }
   .country-list .pct{ font-family: var(--mono); font-size: 12px; color: var(--accent); text-align: right; font-weight: 700 }
-  .compare-box{ background: rgba(0,0,0,0.14); border:1px dashed var(--border-strong); border-radius:8px; padding: 18px 20px }
+  .compare-box{ background: ${dk ? 'rgba(0,0,0,0.14)' : 'var(--bg-card)'}; border:1px dashed var(--border-strong); border-radius:8px; padding: 18px 20px }
   .compare-box .row{ display:flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px }
   .compare-box .row .k{ font-family: var(--mono); font-size: 10px; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.1em; min-width: 70px }
   .compare-box .row .v{ font-family: var(--mono); font-size: 12px; color: var(--text-pri); text-align: right }
   .compare-box .gap-note{ margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 11px; color: var(--amber); line-height: 1.6 }
   /* ── Gap cards ── */
   .gaps{ display: grid; grid-template-columns: 1fr 1fr; gap: 16px }
-  .gap-card{ background: rgba(0,0,0,0.14); border: 1px solid var(--border); border-radius: 8px; padding: 16px 18px; position: relative }
+  .gap-card{ background: ${dk ? 'rgba(0,0,0,0.14)' : 'var(--bg-card)'}; border: 1px solid var(--border); border-radius: 8px; padding: 16px 18px; position: relative }
   .gap-card.crit{ border-left: 3px solid var(--danger) }
   .gap-card.warn{ border-left: 3px solid var(--amber) }
   .gap-card.info{ border-left: 3px solid var(--info) }
@@ -2005,7 +1998,7 @@ function buildReportHTML(theme: 'dark' | 'light' = 'dark'): string {
   .gap-card .desc{ font-family: var(--mono); font-size: 11px; color: var(--text-sec); line-height: 1.65 }
   /* ── Actions ── */
   .actions{ display: flex; flex-direction: column; gap: 10px }
-  .action{ display: grid; grid-template-columns: 72px 108px 1fr; gap: 14px; align-items: center; padding: 13px 16px; background: rgba(0,0,0,0.14); border: 1px solid var(--border); border-radius: 8px }
+  .action{ display: grid; grid-template-columns: 72px 108px 1fr; gap: 14px; align-items: center; padding: 13px 16px; background: ${dk ? 'rgba(0,0,0,0.14)' : 'var(--bg-card)'}; border: 1px solid var(--border); border-radius: 8px }
   .sev{ font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 4px 9px; border-radius: 3px; text-align: center; letter-spacing: 0.1em }
   .sev.HIGH{ background: rgba(255,68,102,0.15); color: var(--danger); border: 1px solid rgba(255,68,102,0.4) }
   .sev.MED { background: rgba(255,184,0,0.12); color: var(--amber); border: 1px solid rgba(255,184,0,0.4) }
@@ -2013,7 +2006,7 @@ function buildReportHTML(theme: 'dark' | 'light' = 'dark'): string {
   .mod-tag{ font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.08em }
   .action-text{ font-family: var(--mono); font-size: 12px; color: var(--text-pri); line-height: 1.6 }
   /* ── Sources / Footer ── */
-  .sources{ display: flex; flex-wrap: wrap; gap: 14px 24px; padding: 18px 22px; background: rgba(0,177,162,0.02); border: 1px solid var(--border); border-radius: 10px; align-items: center; justify-content: space-between }
+  .sources{ display: flex; flex-wrap: wrap; gap: 14px 24px; padding: 18px 22px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; align-items: center; justify-content: space-between }
   .src-row{ display:flex; flex-wrap: wrap; gap: 14px 24px; align-items:center }
   .src{ display: inline-flex; align-items: center; gap: 7px; font-family: var(--mono); font-size: 11px; color: var(--text-sec) }
   .src::before{ content:''; width: 6px; height: 6px; border-radius:50%; background: var(--green) }
