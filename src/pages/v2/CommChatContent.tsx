@@ -1920,98 +1920,103 @@ function buildReportHTML(theme: 'dark' | 'light' = 'dark'): string {
   *{box-sizing:border-box}
   html,body{margin:0;padding:0;background:var(--bg-base);color:var(--text-pri);font-family:var(--sans);font-size:14px;line-height:1.6}
   /* ── Layout ── */
-  .wrap{ max-width: 960px; margin: 0 auto; padding: 52px 44px 80px }
+  .wrap{ max-width: 960px; margin: 0 auto; padding: 56px 48px 96px }
   /* ── Header ── */
-  .hdr{ display:flex; justify-content:space-between; align-items:flex-end; padding-bottom:32px; border-bottom:2px solid var(--border-strong); margin-bottom:52px; gap: 24px }
-  .hdr .title{ font-weight:800; font-size:38px; letter-spacing:0.01em; line-height:1.1; color: var(--text-pri) }
-  .hdr .sub{ font-family: var(--mono); font-size: 12px; color: var(--text-sec); margin-top:10px; line-height:1.6 }
-  .hdr .strap{ font-family: var(--mono); font-size: 11px; color: var(--text-mute); margin-top:7px; max-width:600px; line-height:1.7 }
-  .hdr .badges{ display:flex; gap:7px; flex-wrap:wrap; align-items:center; margin-top:18px }
+  .hdr{ padding-bottom:36px; border-bottom:2px solid var(--border-strong); margin-bottom:60px }
+  .hdr-top{ display:flex; justify-content:space-between; align-items:flex-start; gap: 32px }
+  .hdr .title{ font-weight:800; font-size:46px; letter-spacing:-0.02em; line-height:1.05; color: var(--text-pri) }
+  .hdr .sub{ font-family: var(--mono); font-size: 12px; color: var(--text-sec); margin-top:14px; line-height:1.6 }
+  .hdr .strap{ font-family: var(--mono); font-size: 11px; color: var(--text-mute); margin-top:6px; line-height:1.7 }
+  .hdr .badges{ display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-top:24px }
   /* ── Badges ── */
-  .badge{ font-family: var(--mono); font-size: 10px; padding: 5px 10px; background: var(--accent-dim); color: var(--accent); border: 1px solid var(--border-strong); border-radius: 3px; letter-spacing: 0.09em; text-transform: uppercase; white-space: nowrap }
-  .badge.live{ color: var(--green); border-color: rgba(0,204,119,0.30); background: rgba(0,204,119,0.08); display: inline-flex; align-items:center; gap:5px }
+  .badge{ font-family: var(--mono); font-size: 9px; padding: 4px 9px; background: var(--accent-dim); color: var(--accent); border: 1px solid var(--border-strong); border-radius: 3px; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap }
+  .badge.live{ color: var(--green); border-color: rgba(0,204,119,0.28); background: rgba(0,204,119,0.08); display: inline-flex; align-items:center; gap:5px }
   .badge.live::before{ content:''; width:5px; height:5px; border-radius:50%; background: var(--green) }
   /* ── KPI hero ── */
-  .hero{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-bottom: 40px }
-  .kpi{ background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 22px 22px 20px; position: relative; overflow:hidden }
-  .kpi.danger{ border-color: rgba(255,68,102,0.35) }
-  .kpi.warning{ border-color: rgba(255,184,0,0.35) }
-  .kpi .lbl{ font-family: var(--mono); font-size: 10px; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.13em; margin-bottom: 12px }
-  .kpi .val{ font-family: var(--mono); font-size: 58px; font-weight: 200; line-height: 1; letter-spacing: -0.03em }
+  .hero{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 48px }
+  .kpi{ background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 24px 24px 22px; position: relative; overflow:hidden }
+  .kpi.danger{ border-color: rgba(255,68,102,0.30) }
+  .kpi.warning{ border-color: rgba(255,184,0,0.30) }
+  .kpi .lbl{ font-family: var(--mono); font-size: 9px; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.16em; margin-bottom: 16px }
+  .kpi .val{ font-family: var(--mono); font-size: 62px; font-weight: 200; line-height: 1; letter-spacing: -0.03em }
   .kpi .val.danger{ color: var(--danger) }
   .kpi .val.warning{ color: var(--amber) }
-  .kpi .note{ font-family: var(--mono); font-size: 11px; color: var(--text-sec); margin-top: 14px; line-height:1.65 }
-  .kpi .corner{ position:absolute; top:14px; right:16px; font-family: var(--mono); font-size: 10px; color: var(--text-mute); letter-spacing: 0.12em }
+  .kpi .note{ font-family: var(--sans); font-size: 12px; color: var(--text-sec); margin-top: 16px; line-height:1.7 }
+  .kpi .corner{ position:absolute; top:14px; right:16px; font-family: var(--mono); font-size: 9px; color: var(--text-mute); letter-spacing: 0.14em }
   /* ── Cards ── */
-  .card{ background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 24px; overflow: hidden }
-  .card-head{ display:flex; justify-content:space-between; align-items:center; padding: 14px 22px; border-bottom: 1px solid var(--border); background: rgba(0,177,162,0.02) }
-  .card-head .label{ font-family: var(--mono); font-size: 11px; color: var(--text-pri); text-transform: uppercase; letter-spacing: 0.13em }
-  .card-head .meta{ font-family: var(--mono); font-size: 10px; color: var(--text-sec) }
-  .card-body{ padding: 22px 24px }
+  .card{ background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 28px; overflow: hidden }
+  .card-head{ display:flex; justify-content:space-between; align-items:center; padding: 16px 26px; border-bottom: 1px solid var(--border-strong); background: var(--card-head-bg); gap: 16px }
+  .card-head .meta{ font-family: var(--mono); font-size: 10px; color: var(--text-mute); flex-shrink:0; text-align:right }
+  /* Module label: two-line — number chip + title */
+  .mod-num{ font-family: var(--mono); font-size: 9px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.18em; display:block; margin-bottom: 4px }
+  .mod-title{ font-family: var(--sans); font-size: 15px; font-weight: 600; color: var(--text-pri); display:block; letter-spacing:-0.01em; line-height:1.2 }
+  .card-body{ padding: 26px 28px }
   /* ── Funnel ── */
-  .funnel{ display:flex; flex-direction: column; gap: 9px; padding: 4px 0 }
-  .frow{ display: grid; grid-template-columns: 180px 1fr 110px 90px; align-items: center; gap: 14px }
+  .funnel{ display:flex; flex-direction: column; gap: 10px; padding: 2px 0 }
+  .frow{ display: grid; grid-template-columns: 192px 1fr 108px 96px; align-items: center; gap: 14px }
   .frow .step{ font-family: var(--mono); font-size: 12px; color: var(--text-pri) }
-  .frow .bar-wrap{ height: 24px; position: relative; background: var(--border); border-radius: 3px; overflow:hidden }
+  .frow .bar-wrap{ height: 20px; position: relative; background: var(--border); border-radius: 3px; overflow:hidden }
   .frow .bar{ height: 100%; background: var(--accent); opacity:0.85; border-radius: 3px }
   .frow .bar.crit{ background: var(--danger) }
-  .frow .cnt{ font-family: var(--mono); font-size: 14px; text-align: right; color: var(--text-pri) }
-  .frow .drop{ font-family: var(--mono); font-size: 12px; text-align: right; color: var(--text-sec) }
+  .frow .cnt{ font-family: var(--mono); font-size: 16px; font-weight:600; text-align: right; color: var(--text-pri) }
+  .frow .drop{ font-family: var(--mono); font-size: 11px; text-align: right; color: var(--text-sec) }
   .frow .drop.crit{ color: var(--danger); font-weight: 700 }
-  .funnel-callout{ margin-top: 18px; padding: 13px 16px; border-left: 3px solid var(--danger); background: rgba(255,68,102,0.06); font-family: var(--mono); font-size: 12px; color: var(--text-pri); line-height: 1.65 }
+  .funnel-callout{ margin-top: 22px; padding: 16px 20px; border-left: 3px solid var(--danger); background: rgba(255,68,102,0.05); font-family: var(--sans); font-size: 13px; color: var(--text-pri); line-height: 1.75 }
   .funnel-callout b{ color: var(--danger) }
-  .conv-line{ display:flex; justify-content: space-between; align-items: center; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border) }
-  .conv-line .tag{ font-family: var(--mono); font-size: 10px; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.12em }
-  .conv-line .num{ font-family: var(--mono); font-size: 18px; color: var(--accent); font-weight: 700 }
+  .conv-line{ display:flex; justify-content: space-between; align-items: center; margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--border) }
+  .conv-line .tag{ font-family: var(--mono); font-size: 9px; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.14em }
+  .conv-line .num{ font-family: var(--mono); font-size: 22px; color: var(--accent); font-weight: 700 }
   /* ── Ad detail ── */
-  .ad-grid{ display: grid; grid-template-columns: 1fr 1fr; gap: 8px 40px }
-  .ad-row{ display:flex; justify-content: space-between; align-items: baseline; padding: 8px 0; border-bottom: 1px dotted var(--border) }
-  .ad-row .k{ font-family: var(--mono); font-size: 11px; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.08em }
+  .ad-grid{ display: grid; grid-template-columns: 1fr 1fr; gap: 0 52px }
+  .ad-row{ display:flex; justify-content: space-between; align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--border) }
+  .ad-row .k{ font-family: var(--mono); font-size: 10px; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.1em }
   .ad-row .v{ font-family: var(--mono); font-size: 13px; color: var(--text-pri) }
   .ad-row .v.warn{ color: var(--amber) }
-  .ad-row .v.big{ font-size: 16px; color: var(--accent) }
-  .alert-box{ margin-top: 18px; padding: 14px 16px; border-left: 3px solid var(--amber); background: rgba(255,184,0,0.04) }
-  .alert-box .ttl{ font-family: var(--mono); font-size: 11px; color: var(--amber); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px }
-  .alert-box .body{ font-family: var(--mono); font-size: 12px; color: var(--text-pri); line-height: 1.65 }
-  .alert-box .src{ font-family: var(--mono); font-size: 10px; color: var(--text-mute); margin-top: 6px }
+  .ad-row .v.big{ font-size: 19px; font-weight:600; color: var(--accent) }
+  .alert-box{ margin-top: 22px; padding: 16px 20px; border-left: 3px solid var(--amber); background: rgba(255,184,0,0.04) }
+  .alert-box .ttl{ font-family: var(--mono); font-size: 9px; color: var(--amber); text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 8px }
+  .alert-box .body{ font-family: var(--sans); font-size: 13px; color: var(--text-pri); line-height: 1.75 }
+  .alert-box .src{ font-family: var(--mono); font-size: 10px; color: var(--text-mute); margin-top: 10px }
   /* ── Geo ── */
   .country-grid{ display: grid; grid-template-columns: 1.4fr 1fr; gap: 28px }
-  .country-list .crow{ display:grid; grid-template-columns: 50px 1fr 70px 60px; gap:12px; align-items:center; padding:9px 0 }
+  .country-list .crow{ display:grid; grid-template-columns: 52px 1fr 72px 64px; gap:12px; align-items:center; padding:10px 0; border-bottom:1px solid var(--border) }
+  .country-list .crow:last-child{ border-bottom:none }
   .country-list .name{ font-family: var(--mono); font-size: 12px; color: var(--text-pri) }
   .country-list .bar-wrap{ height: 8px; background: var(--border); border-radius: 4px; overflow: hidden }
   .country-list .bar{ height: 100%; background: var(--accent); opacity: 0.75; border-radius: 4px }
   .country-list .min{ font-family: var(--mono); font-size: 11px; color: var(--text-sec); text-align: right }
-  .country-list .pct{ font-family: var(--mono); font-size: 12px; color: var(--accent); text-align: right; font-weight: 700 }
-  .compare-box{ background: ${dk ? 'rgba(0,0,0,0.14)' : 'var(--bg-card)'}; border:1px dashed var(--border-strong); border-radius:8px; padding: 18px 20px }
-  .compare-box .row{ display:flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px }
-  .compare-box .row .k{ font-family: var(--mono); font-size: 10px; color: var(--text-sec); text-transform: uppercase; letter-spacing: 0.1em; min-width: 70px }
-  .compare-box .row .v{ font-family: var(--mono); font-size: 12px; color: var(--text-pri); text-align: right }
-  .compare-box .gap-note{ margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 11px; color: var(--amber); line-height: 1.6 }
+  .country-list .pct{ font-family: var(--mono); font-size: 14px; color: var(--accent); text-align: right; font-weight: 700 }
+  .compare-box{ background: ${dk ? 'rgba(0,0,0,0.14)' : 'var(--bg-card)'}; border:1px dashed var(--border-strong); border-radius:8px; padding: 20px 22px }
+  .compare-box .row{ display:flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px }
+  .compare-box .row .k{ font-family: var(--mono); font-size: 9px; color: var(--text-mute); text-transform: uppercase; letter-spacing: 0.12em; min-width: 70px }
+  .compare-box .row .v{ font-family: var(--mono); font-size: 13px; color: var(--text-pri); text-align: right }
+  .compare-box .gap-note{ margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); font-family: var(--sans); font-size: 12px; color: var(--amber); line-height: 1.7 }
   /* ── Gap cards ── */
   .gaps{ display: grid; grid-template-columns: 1fr 1fr; gap: 16px }
-  .gap-card{ background: ${dk ? 'rgba(0,0,0,0.14)' : 'var(--bg-card)'}; border: 1px solid var(--border); border-radius: 8px; padding: 16px 18px; position: relative }
+  .gap-card{ background: ${dk ? 'rgba(0,0,0,0.14)' : 'var(--bg-card)'}; border: 1px solid var(--border); border-radius: 8px; padding: 18px 20px; position: relative }
   .gap-card.crit{ border-left: 3px solid var(--danger) }
   .gap-card.warn{ border-left: 3px solid var(--amber) }
   .gap-card.info{ border-left: 3px solid var(--info) }
-  .gap-card .id{ position:absolute; top: 10px; right: 14px; font-family: var(--mono); font-size: 10px; color: var(--text-mute); letter-spacing: 0.1em }
-  .gap-card .ttl{ font-family: var(--mono); font-size: 13px; color: var(--text-pri); font-weight: 700; margin-bottom: 7px; padding-right: 40px }
-  .gap-card .desc{ font-family: var(--mono); font-size: 11px; color: var(--text-sec); line-height: 1.65 }
+  .gap-card .id{ position:absolute; top: 12px; right: 16px; font-family: var(--mono); font-size: 9px; color: var(--text-mute); letter-spacing: 0.12em }
+  .gap-card .ttl{ font-family: var(--sans); font-size: 14px; font-weight:700; color: var(--text-pri); margin-bottom: 8px; padding-right: 44px; line-height:1.3 }
+  .gap-card .desc{ font-family: var(--sans); font-size: 12px; color: var(--text-sec); line-height: 1.75 }
   /* ── Actions ── */
   .actions{ display: flex; flex-direction: column; gap: 10px }
-  .action{ display: grid; grid-template-columns: 72px 108px 1fr; gap: 14px; align-items: center; padding: 13px 16px; background: ${dk ? 'rgba(0,0,0,0.14)' : 'var(--bg-card)'}; border: 1px solid var(--border); border-radius: 8px }
-  .sev{ font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 4px 9px; border-radius: 3px; text-align: center; letter-spacing: 0.1em }
-  .sev.HIGH{ background: rgba(255,68,102,0.15); color: var(--danger); border: 1px solid rgba(255,68,102,0.4) }
-  .sev.MED { background: rgba(255,184,0,0.12); color: var(--amber); border: 1px solid rgba(255,184,0,0.4) }
-  .sev.LOW { background: rgba(59,130,246,0.12); color: var(--info); border: 1px solid rgba(59,130,246,0.4) }
-  .mod-tag{ font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 0.08em }
-  .action-text{ font-family: var(--mono); font-size: 12px; color: var(--text-pri); line-height: 1.6 }
+  .action{ display: grid; grid-template-columns: 68px 96px 1fr; gap: 16px; align-items: start; padding: 15px 18px; background: ${dk ? 'rgba(0,0,0,0.14)' : 'var(--bg-card)'}; border: 1px solid var(--border); border-radius: 8px }
+  .action > *{ padding-top: 1px }
+  .sev{ font-family: var(--mono); font-size: 9px; font-weight: 700; padding: 4px 8px; border-radius: 3px; text-align: center; letter-spacing: 0.12em; display:block }
+  .sev.HIGH{ background: rgba(255,68,102,0.12); color: var(--danger); border: 1px solid rgba(255,68,102,0.35) }
+  .sev.MED { background: rgba(255,184,0,0.10); color: var(--amber); border: 1px solid rgba(255,184,0,0.35) }
+  .sev.LOW { background: rgba(59,130,246,0.10); color: var(--info); border: 1px solid rgba(59,130,246,0.35) }
+  .mod-tag{ font-family: var(--mono); font-size: 10px; color: var(--accent); letter-spacing: 0.07em; display:block }
+  .action-text{ font-family: var(--sans); font-size: 13px; color: var(--text-pri); line-height: 1.7 }
   /* ── Sources / Footer ── */
-  .sources{ display: flex; flex-wrap: wrap; gap: 14px 24px; padding: 18px 22px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; align-items: center; justify-content: space-between }
-  .src-row{ display:flex; flex-wrap: wrap; gap: 14px 24px; align-items:center }
-  .src{ display: inline-flex; align-items: center; gap: 7px; font-family: var(--mono); font-size: 11px; color: var(--text-sec) }
-  .src::before{ content:''; width: 6px; height: 6px; border-radius:50%; background: var(--green) }
+  .sources{ display: flex; flex-wrap: wrap; gap: 12px 22px; padding: 20px 24px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; align-items: center; justify-content: space-between }
+  .src-row{ display:flex; flex-wrap: wrap; gap: 10px 20px; align-items:center }
+  .src{ display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 11px; color: var(--text-sec) }
+  .src::before{ content:''; width: 5px; height: 5px; border-radius:50%; background: var(--green); flex-shrink:0 }
   .sign{ font-family: var(--mono); font-size: 10px; color: var(--text-mute); letter-spacing: 0.08em }
-  .foot{ text-align:center; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 11px; color: var(--text-mute) }
+  .foot{ text-align:center; margin-top: 48px; padding-top: 22px; border-top: 1px solid var(--border); font-family: var(--mono); font-size: 10px; color: var(--text-mute); line-height:1.8 }
   .row-flex{ display:flex; align-items:center; gap: 8px }
 </style>
 </head>
@@ -2019,16 +2024,18 @@ function buildReportHTML(theme: 'dark' | 'light' = 'dark'): string {
 <div class="wrap">
 
   <header class="hdr">
-    <div>
-      <div class="title">drama 投放复盘</div>
-      <div class="sub">2026-05-13 → 2026-05-19 · PopularReels &amp; Bestshort (act_800509389474426)</div>
-      <div class="strap">数据导向的 7 天产品 + 投放诊断：核心异常 / 漏斗瓶颈 / 流量真相 / 缺口 / 行动</div>
-    </div>
-    <div class="badges">
-      <span class="badge">W20</span>
-      <span class="badge">7 day window</span>
-      <span class="badge">USD</span>
-      <span class="badge live">data live</span>
+    <div class="hdr-top">
+      <div>
+        <div class="title">drama 投放复盘</div>
+        <div class="sub">2026-05-13 → 2026-05-19 · PopularReels &amp; Bestshort (act_800509389474426)</div>
+        <div class="strap">数据导向的 7 天产品 + 投放诊断：核心异常 / 漏斗瓶颈 / 流量真相 / 缺口 / 行动</div>
+      </div>
+      <div class="badges">
+        <span class="badge">W20</span>
+        <span class="badge">7 day window</span>
+        <span class="badge">USD</span>
+        <span class="badge live">data live</span>
+      </div>
     </div>
   </header>
 
@@ -2055,7 +2062,7 @@ function buildReportHTML(theme: 'dark' | 'light' = 'dark'): string {
 
   <div class="card">
     <div class="card-head">
-      <div class="label">MOD · 02 — 全链路漏斗 7 节点</div>
+      <div><span class="mod-num">MOD · 02</span><span class="mod-title">全链路漏斗 7 节点</span></div>
       <div class="meta">data: play_sessions + Stripe + recharge_records</div>
     </div>
     <div class="card-body">
@@ -2081,7 +2088,7 @@ function buildReportHTML(theme: 'dark' | 'light' = 'dark'): string {
 
   <div class="card">
     <div class="card-head">
-      <div class="label">MOD · 03 — Meta 投放数据（primary 账号）</div>
+      <div><span class="mod-num">MOD · 03</span><span class="mod-title">Meta 投放数据（primary 账号）</span></div>
       <div class="meta">act_800509389474426 · USD · 7d</div>
     </div>
     <div class="card-body">
@@ -2107,7 +2114,7 @@ function buildReportHTML(theme: 'dark' | 'light' = 'dark'): string {
 
   <div class="card">
     <div class="card-head">
-      <div class="label">MOD · 04 — 真实流量地理分布</div>
+      <div><span class="mod-num">MOD · 04</span><span class="mod-title">真实流量地理分布</span></div>
       <div class="meta">source: Cloudflare Stream — minutesViewed by country</div>
     </div>
     <div class="card-body">
@@ -2130,7 +2137,7 @@ function buildReportHTML(theme: 'dark' | 'light' = 'dark'): string {
 
   <div class="card">
     <div class="card-head">
-      <div class="label">MOD · 05 — drama BI 已知陷阱清单</div>
+      <div><span class="mod-num">MOD · 05</span><span class="mod-title">drama BI 已知陷阱清单</span></div>
       <div class="meta">source: docs/design/observability/data-gaps.md</div>
     </div>
     <div class="card-body">
@@ -2146,7 +2153,7 @@ function buildReportHTML(theme: 'dark' | 'light' = 'dark'): string {
 
   <div class="card">
     <div class="card-head">
-      <div class="label">MOD · 06 — 下周必须做的事</div>
+      <div><span class="mod-num">MOD · 06</span><span class="mod-title">下周必须做的事</span></div>
       <div class="meta">source: Claude Opus 4.7 reflection · 2026-05-19</div>
     </div>
     <div class="card-body">
