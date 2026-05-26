@@ -1734,43 +1734,89 @@ function ExportReportReply() {
 }
 
 function DownloadReportRow() {
-  const [state, setState] = React.useState<'idle' | 'loading' | 'done'>('idle');
+  const [darkState,  setDarkState]  = React.useState<'idle' | 'loading' | 'done'>('idle');
+  const [lightState, setLightState] = React.useState<'idle' | 'loading' | 'done'>('idle');
 
-  const handleDownload = () => {
-    setState('loading');
+  const triggerDownload = (theme: 'dark' | 'light') => {
+    const setter = theme === 'dark' ? setDarkState : setLightState;
+    setter('loading');
     setTimeout(() => {
-      const html = buildReportHTML();
+      const html = buildReportHTML(theme);
       const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'drama-W20-投放复盘-2026-05-13_19.html';
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement('a');
+      a.href     = url;
+      a.download = `drama-W20-投放复盘-2026-05-13_19${theme === 'light' ? '-light' : ''}.html`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      setState('done');
+      setter('done');
     }, 800);
+  };
+
+  const DownloadBtn = ({ theme, state }: { theme: 'dark' | 'light'; state: 'idle' | 'loading' | 'done' }) => {
+    const isDone    = state === 'done';
+    const isLoading = state === 'loading';
+    const btnColor  = isDone ? '#00CC77' : c.accent;
+    const isLight   = theme === 'light';
+    return (
+      <button
+        onClick={() => state === 'idle' && triggerDownload(theme)}
+        disabled={state !== 'idle'}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0,
+          background: isDone
+            ? 'rgba(0,204,119,0.10)'
+            : isLoading
+              ? 'rgba(0,177,162,0.06)'
+              : isLight ? 'rgba(255,255,255,0.05)' : 'rgba(0,177,162,0.09)',
+          border: `1px solid ${isDone ? 'rgba(0,204,119,0.28)' : isLight ? c.border : 'rgba(0,177,162,0.24)'}`,
+          borderRadius: 5, padding: '5px 11px',
+          cursor: state === 'idle' ? 'pointer' : 'default',
+          transition: 'all 0.2s',
+        }}
+      >
+        {isLoading ? (
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={c.accent} strokeWidth="2.5"
+            style={{ animation: 'rpt-gen-spin 1s linear infinite' }}>
+            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+          </svg>
+        ) : isDone ? (
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#00CC77" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        ) : (
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={btnColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        )}
+        <M size={8} color={isDone ? '#00CC77' : btnColor} upper style={{ letterSpacing: '0.08em' }}>
+          {isLoading ? '生成中…' : isDone ? '已下载' : isLight ? 'Light' : 'Dark'}
+        </M>
+      </button>
+    );
   };
 
   return (
     <div style={{
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      background: state === 'done' ? 'rgba(0,204,119,0.05)' : 'rgba(0,177,162,0.03)',
-      border: `1px solid ${state === 'done' ? 'rgba(0,204,119,0.2)' : 'rgba(0,177,162,0.14)'}`,
-      borderRadius: 8, padding: '10px 14px',
-      transition: 'all 0.3s',
+      background: 'rgba(0,177,162,0.03)',
+      border: `1px solid rgba(0,177,162,0.12)`,
+      borderRadius: 8, padding: '10px 14px', gap: 12,
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+      {/* File info */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0 }}>
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-          stroke={state === 'done' ? '#00CC77' : c.accent}
-          strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+          stroke={c.accent} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
           <polyline points="14 2 14 8 20 8"/>
           <line x1="16" y1="13" x2="8" y2="13"/>
           <line x1="16" y1="17" x2="8" y2="17"/>
         </svg>
-        <div>
+        <div style={{ minWidth: 0 }}>
           <M size={10} color={c.textPri} style={{ display: 'block' }}>
             drama-W20-投放复盘-2026-05-13_19.html
           </M>
@@ -1779,41 +1825,11 @@ function DownloadReportRow() {
           </M>
         </div>
       </div>
-      <button
-        onClick={handleDownload}
-        disabled={state !== 'idle'}
-        style={{
-          display: 'flex', alignItems: 'center', gap: 6,
-          background: state === 'done'
-            ? 'rgba(0,204,119,0.12)'
-            : state === 'loading'
-              ? 'rgba(0,177,162,0.08)'
-              : 'rgba(0,177,162,0.10)',
-          border: `1px solid ${state === 'done' ? 'rgba(0,204,119,0.3)' : 'rgba(0,177,162,0.25)'}`,
-          borderRadius: 6, padding: '5px 12px', cursor: state === 'idle' ? 'pointer' : 'default',
-          transition: 'all 0.2s', flexShrink: 0,
-        }}
-      >
-        {state === 'loading' ? (
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={c.accent} strokeWidth="2.5"
-            style={{ animation: 'rpt-gen-spin 1s linear infinite' }}>
-            <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-          </svg>
-        ) : state === 'done' ? (
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#00CC77" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="20 6 9 17 4 12"/>
-          </svg>
-        ) : (
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={c.accent} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-            <polyline points="7 10 12 15 17 10"/>
-            <line x1="12" y1="15" x2="12" y2="3"/>
-          </svg>
-        )}
-        <M size={9} color={state === 'done' ? '#00CC77' : c.accent} upper style={{ letterSpacing: '0.07em' }}>
-          {state === 'loading' ? 'Generating…' : state === 'done' ? 'Downloaded' : 'Download'}
-        </M>
-      </button>
+      {/* Two theme buttons */}
+      <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+        <DownloadBtn theme="dark"  state={darkState}  />
+        <DownloadBtn theme="light" state={lightState} />
+      </div>
     </div>
   );
 }
